@@ -57,7 +57,7 @@ def get_private_patient_context(patient_id: str, db: Session) -> Dict[str, Any]:
         .all()
     )
     contact_list = [
-        f"{c.name} ({c.relationship}, Phone: {c.phone_number})"
+        f"{c.name} ({getattr(c, 'relationship_type', 'Contact')}, Phone: {getattr(c, 'phone', 'Unknown')})"
         for c in contacts
     ]
 
@@ -103,7 +103,7 @@ def get_private_patient_context(patient_id: str, db: Session) -> Dict[str, Any]:
         .all()
     )
     baseline_summary = [
-        f"Domain {b.domain}: Mean Score {b.baseline_score}/100, Latency {b.baseline_latency_ms}ms"
+        f"{b.metric_name}: Baseline {b.baseline_value:.1f} (Samples: {b.sample_count}, Window: {b.window_days}d)"
         for b in baselines
     ]
 
