@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 11 19 32;
+    --foreground: 255 255 255;
+  }
+
+  body {
+    background-color: #0B1320;
+    color: #F8FAFC;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+  }
+
+  /* High contrast accessible focus indicator */
+  *:focus-visible {
+    outline: 4px solid #38BDF8 !important;
+    outline-offset: 4px !important;
+  }
+}
+
+/* Accessibility UI Scaling (Normal, Large, Extra Large) */
+html[data-scale="normal"] {
+  font-size: 15px;
+}
+
+html[data-scale="large"] {
+  font-size: 18px;
+}
+
+html[data-scale="extra-large"] {
+  font-size: 21px;
+}
+
+/* Touch target sizing adaptation */
+html[data-scale="normal"] .big-touch-target {
+  min-height: 50px !important;
+}
+
+html[data-scale="large"] .big-touch-target {
+  min-height: 64px !important;
+}
+
+html[data-scale="extra-large"] .big-touch-target {
+  min-height: 76px !important;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7);
+  }
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 25px rgba(56, 189, 248, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0);
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes sos-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8);
+  }
+  50% {
+    box-shadow: 0 0 0 30px rgba(239, 68, 68, 0);
+  }
+}
+
+.animate-sos-pulse {
+  animation: sos-pulse 1.8s infinite;
+}

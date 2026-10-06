@@ -1,0 +1,73 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: cognicare-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cognicare}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cognicare_secure_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-cognicare_db}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cognicare} -d ${POSTGRES_DB:-cognicare_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cognicare-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cognicare-backend
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      - APP_ENV=${APP_ENV:-production}
+      - DEBUG=${DEBUG:-false}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://cognicare:cognicare_secure_pass@db:5432/cognicare_db}
+      - SECRET_KEY=${SECRET_KEY:-cognicare-super-secure-production-ready-secret-key-32-chars-min}
+      - RATE_LIMIT_ENABLED=${RATE_LIMIT_ENABLED:-true}
+      - USE_MOCK_AI=${USE_MOCK_AI:-false}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-YOUR_GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - BACKEND_CORS_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000"]
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - cognicare-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cognicare-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000/api/v1}
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - cognicare-net
+
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  cognicare-net:
+    driver: bridge

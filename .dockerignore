@@ -1,0 +1,14 @@
+.git
+.github
+.ai
+.venv
+__pycache__
+*.pyc
+node_modules
+.next
+.pytest_cache
+.coverage
+*.db
+*.sqlite3
+.DS_Store
+*.md
