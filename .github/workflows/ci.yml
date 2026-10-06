@@ -48,6 +48,10 @@ jobs:
         working-directory: ./frontend
         run: npm ci
 
+      - name: Run ESLint Linter
+        working-directory: ./frontend
+        run: npm run lint
+
       - name: Run Vitest Unit Tests
         working-directory: ./frontend
         run: npm test -- --run

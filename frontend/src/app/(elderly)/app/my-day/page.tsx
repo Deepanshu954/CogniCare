@@ -40,6 +40,7 @@ export default function MyDayPage() {
         fetchReminders();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isAuthLoading, patientId]);
 
   const handleAcknowledge = async (reminderId: string) => {
@@ -129,7 +130,7 @@ export default function MyDayPage() {
         {/* Today's Schedule Timeline */}
         <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8">
           <h2 className="text-2xl sm:text-3xl font-black text-white mb-6">
-            Today's Schedule
+            Today&apos;s Schedule
           </h2>
 
           <div className="space-y-4">

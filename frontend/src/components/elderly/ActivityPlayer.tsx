@@ -409,7 +409,7 @@ export const ActivityPlayer: React.FC<ActivityPlayerProps> = ({
                 onClick={() => setIsStudyingPhase(false)}
                 className="w-full sm:w-auto min-h-[64px] bg-sky-600 hover:bg-sky-500 text-white text-xl font-black px-10 py-4 rounded-2xl border-2 border-sky-400 shadow-xl flex items-center justify-center gap-2 mx-auto cursor-pointer"
               >
-                <span>I'm Ready to Answer!</span>
+                <span>I&apos;m Ready to Answer!</span>
                 <ArrowRight className="w-6 h-6" />
               </button>
             </div>

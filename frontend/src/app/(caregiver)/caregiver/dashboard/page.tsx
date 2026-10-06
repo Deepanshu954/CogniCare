@@ -55,6 +55,7 @@ export default function CaregiverDashboardPage() {
         loadPatients();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isAuthLoading]);
 
   const loadPatients = async () => {
@@ -182,7 +183,7 @@ export default function CaregiverDashboardPage() {
             <div>
               <h3 className="text-lg font-bold text-white mb-1 flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                <span>Today's Care Adherence</span>
+                <span>Today&apos;s Care Adherence</span>
               </h3>
               <p className="text-xs text-slate-400">
                 Percentage of scheduled morning, afternoon, and evening care items completed.

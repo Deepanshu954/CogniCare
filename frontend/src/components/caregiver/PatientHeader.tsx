@@ -55,7 +55,7 @@ export const PatientHeader: React.FC<PatientHeaderProps> = ({ patient, summary }
 
       <div className="flex items-center gap-6 border-t md:border-t-0 md:border-l border-slate-800 pt-3 md:pt-0 md:pl-6 text-sm">
         <div>
-          <span className="block text-slate-400 text-xs">Today's Adherence</span>
+          <span className="block text-slate-400 text-xs">Today&apos;s Adherence</span>
           <span className="text-xl font-bold text-white">
             {summary ? `${summary.adherence_percentage}%` : "100%"}
           </span>

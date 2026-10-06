@@ -22,6 +22,7 @@ export const SosButton: React.FC<SosButtonProps> = ({ patientId }) => {
       dispatchSos();
     }
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, countdown, isTriggered]);
 
   const startSosFlow = () => {

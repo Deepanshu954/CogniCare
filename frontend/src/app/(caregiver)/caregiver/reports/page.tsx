@@ -28,6 +28,7 @@ export default function CaregiverReportsPage() {
         loadPatients();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isAuthLoading]);
 
   const loadPatients = async () => {
