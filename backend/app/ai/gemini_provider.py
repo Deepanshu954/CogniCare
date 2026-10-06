@@ -114,8 +114,12 @@ class GeminiProvider:
         current_time_str = now.strftime("%I:%M %p").lstrip("0")
         current_date_str = now.strftime("%A, %B %d")
 
-        # Friendly simplified medication list
-        clean_meds = "Donepezil in the morning, a multivitamin with lunch, and your blood pressure pill before bedtime"
+        # Extract and simplify active medications dynamically
+        meds_section = re.search(r"Prescribed Active Medications:\n(.*?)\n\n", system_prompt, re.DOTALL)
+        meds_text = meds_section.group(1).strip() if meds_section else ""
+        active_meds = [line.strip("- ") for line in meds_text.splitlines() if line.strip().startswith("-")]
+        clean_med_list = [m.split("(")[0].strip() for m in active_meds if "No active" not in m]
+        clean_meds = ", ".join(clean_med_list) if clean_med_list else "your prescribed medicines"
 
         if mode == "extended":
             thinking_steps = (
@@ -128,13 +132,12 @@ class GeminiProvider:
         # 1. Medical safety policy against diagnosis or dosage alterations
         if any(w in lower_msg for w in ["diagnose", "diagnosis", "do i have dementia", "am i getting worse", "alzheimer"]):
             reply = (
-                f"I am here to help with your daily routine and comfort, but I cannot make medical diagnoses. "
+                f"I am here to help with your daily routine and comfort, but I cannot provide medical diagnoses. "
                 f"Your daily activities have been steady. I can let {caregiver_name} or your doctor know if you have concerns."
             )
         elif any(w in lower_msg for w in ["dosage", "two pills", "double dose", "change dose", "stop taking", "change my dose"]):
             reply = (
-                f"Please check with your doctor or {caregiver_name} before changing any doses. "
-                "I have added a reminder to review this with them."
+                f"I cannot adjust medication dosages. Please check with your physician or {caregiver_name} before changing any doses."
             )
         # 2. Clock, Time and Date queries
         elif any(w in lower_msg for w in ["what time", "the time", "time is it", "clock"]):
@@ -147,7 +150,7 @@ class GeminiProvider:
         # 4. Medication queries
         elif any(w in lower_msg for w in ["did i take", "take my pill", "take my pills"]):
             reply = (
-                f"Your morning Donepezil is scheduled with breakfast. "
+                f"Your morning {clean_med_list[0] if clean_med_list else 'medication'} is scheduled with breakfast. "
                 "You can tap 'Confirm' on your My Day screen if you have already taken it."
             )
         elif any(w in lower_msg for w in ["medicine", "pills", "pill", "medication", "dose"]):
@@ -157,7 +160,7 @@ class GeminiProvider:
         # 5. Schedule / daily activities queries
         elif any(w in lower_msg for w in ["what next", "schedule", "today", "what do i do", "what should i do"]):
             reply = (
-                "Today you have your morning breakfast and pills, your daily brain game, and a quiet garden walk this afternoon."
+                f"Today you have your morning routine with {clean_meds}, your daily brain game, and a quiet garden walk this afternoon."
             )
         # 6. Confusion or distress queries (Naomi Feil validation therapy)
         elif any(w in lower_msg for w in ["confused", "lost", "where am i", "scared", "afraid"]):
