@@ -10,6 +10,8 @@ import { apiClient } from "@/lib/api";
 import {
   Send,
   Volume2,
+  VolumeX,
+  Square,
   Bot,
   User,
   Sparkles,
@@ -35,12 +37,46 @@ export default function AssistantPage() {
   const [showContextDetails, setShowContextDetails] = useState(false);
   const [isLiveTalkOpen, setIsLiveTalkOpen] = useState(false);
   const [liveTalkStatus, setLiveTalkStatus] = useState<"idle" | "listening" | "thinking" | "speaking">("idle");
+  const [talkAloud, setTalkAloud] = useState<boolean>(false);
+  const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const patientId = user?.patient_profile?.id;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedTalkAloud = localStorage.getItem("cognicare_talk_aloud");
+      if (savedTalkAloud !== null) {
+        setTalkAloud(savedTalkAloud === "true");
+      }
+    }
+  }, []);
+
+  const toggleTalkAloud = () => {
+    const nextVal = !talkAloud;
+    setTalkAloud(nextVal);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("cognicare_talk_aloud", String(nextVal));
+    }
+    if (!nextVal) {
+      stopSpeaking();
+    }
+  };
+
+  const stopSpeaking = () => {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+    setIsSpeaking(false);
+    setSpeakingMessageId(null);
+    if (liveTalkStatus === "speaking") {
+      setLiveTalkStatus("idle");
+    }
   };
 
   useEffect(() => {
@@ -65,6 +101,9 @@ export default function AssistantPage() {
     const text = textToSend || inputText;
     if (!text.trim() || !conversation || !patientId || isSending) return;
 
+    // Stop any ongoing speech before processing new request
+    stopSpeaking();
+
     setIsSending(true);
     setInputText("");
     if (isLiveTalkOpen) setLiveTalkStatus("thinking");
@@ -86,13 +125,17 @@ export default function AssistantPage() {
       );
       setMessages((prev) => [...prev, res.data]);
 
-      // Speech synthesis for live talk or voice response
-      if (isLiveTalkOpen) {
-        setLiveTalkStatus("speaking");
-      }
-      speakText(res.data.content, () => {
+      // Only speak aloud if user has explicitly enabled Talk Aloud OR is in Live Talk mode
+      if (talkAloud || isLiveTalkOpen) {
+        if (isLiveTalkOpen) {
+          setLiveTalkStatus("speaking");
+        }
+        speakText(res.data.content, res.data.id, () => {
+          if (isLiveTalkOpen) setLiveTalkStatus("idle");
+        });
+      } else {
         if (isLiveTalkOpen) setLiveTalkStatus("idle");
-      });
+      }
     } catch (e: any) {
       console.error("Message send error:", e);
       if (isLiveTalkOpen) setLiveTalkStatus("idle");
@@ -101,17 +144,28 @@ export default function AssistantPage() {
     }
   };
 
-  const speakText = (text: string, onEnd?: () => void) => {
+  const speakText = (text: string, messageId?: string, onEnd?: () => void) => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.cancel();
+      setIsSpeaking(true);
+      if (messageId) setSpeakingMessageId(messageId);
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = 0.95; // Gentle pace for senior comfort
-      if (onEnd) {
-        utterance.onend = onEnd;
-      }
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        setSpeakingMessageId(null);
+        if (onEnd) onEnd();
+      };
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        setSpeakingMessageId(null);
+        if (onEnd) onEnd();
+      };
       window.speechSynthesis.speak(utterance);
-    } else if (onEnd) {
-      onEnd();
+    } else {
+      setIsSpeaking(false);
+      setSpeakingMessageId(null);
+      if (onEnd) onEnd();
     }
   };
 
@@ -163,37 +217,74 @@ export default function AssistantPage() {
         {/* Model Mode Switcher & Live Talk Banner */}
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-6 mb-6 shadow-xl">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 border-b border-slate-800">
-            {/* Mode Selector */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 mr-1">
-                AI Mode:
-              </span>
-              <div className="flex items-center bg-slate-950 p-1 rounded-2xl border border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setActiveMode("normal")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black transition cursor-pointer ${
-                    activeMode === "normal"
-                      ? "bg-emerald-600 text-white shadow-md shadow-emerald-900/40"
-                      : "text-slate-400 hover:text-white"
-                  }`}
-                >
-                  <Zap className="w-4 h-4" />
-                  <span>Gemini 3.8 Live</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveMode("extended")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black transition cursor-pointer ${
-                    activeMode === "extended"
-                      ? "bg-purple-600 text-white shadow-md shadow-purple-900/40"
-                      : "text-slate-400 hover:text-white"
-                  }`}
-                >
-                  <Brain className="w-4 h-4 text-purple-200" />
-                  <span>Extended Thinking</span>
-                </button>
+            {/* Controls Bar: AI Mode + Talk Aloud Toggle + Stop Speaking + Live Talk */}
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Mode Selector */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 mr-1 hidden sm:inline">
+                  AI Mode:
+                </span>
+                <div className="flex items-center bg-slate-950 p-1 rounded-2xl border border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setActiveMode("normal")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black transition cursor-pointer ${
+                      activeMode === "normal"
+                        ? "bg-emerald-600 text-white shadow-md shadow-emerald-900/40"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    <Zap className="w-4 h-4" />
+                    <span>Gemini 3.8 Live</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveMode("extended")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black transition cursor-pointer ${
+                      activeMode === "extended"
+                        ? "bg-purple-600 text-white shadow-md shadow-purple-900/40"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    <Brain className="w-4 h-4 text-purple-200" />
+                    <span>Extended Thinking</span>
+                  </button>
+                </div>
               </div>
+
+              {/* Talk Aloud Toggle Button */}
+              <button
+                type="button"
+                onClick={toggleTalkAloud}
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-2xl text-xs sm:text-sm font-bold border transition cursor-pointer ${
+                  talkAloud
+                    ? "bg-emerald-950/80 border-emerald-500 text-emerald-300 shadow-sm"
+                    : "bg-slate-950 border-slate-800 text-slate-400 hover:text-white"
+                }`}
+                title="Toggle automatic spoken voice responses"
+                aria-label={talkAloud ? "Voice read aloud is enabled. Tap to mute." : "Voice read aloud is disabled. Tap to enable."}
+              >
+                {talkAloud ? (
+                  <Volume2 className="w-4 h-4 text-emerald-400" />
+                ) : (
+                  <VolumeX className="w-4 h-4 text-slate-500" />
+                )}
+                <span>{talkAloud ? "Talk Aloud: ON" : "Talk Aloud: OFF"}</span>
+              </button>
+
+              {/* Global Stop Speaking Button (Shown when TTS is active) */}
+              {isSpeaking && (
+                <button
+                  type="button"
+                  onClick={stopSpeaking}
+                  className="flex items-center gap-2 px-3.5 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs sm:text-sm font-black rounded-2xl shadow-lg shadow-rose-900/50 animate-pulse cursor-pointer transition"
+                  title="Stop assistant speech immediately"
+                  aria-label="Stop speaking"
+                >
+                  <Square className="w-4 h-4 fill-current" />
+                  <span>Stop Speaking</span>
+                </button>
+              )}
             </div>
 
             {/* Live Talk Button */}
@@ -205,7 +296,7 @@ export default function AssistantPage() {
               className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold rounded-2xl text-sm shadow-lg shadow-sky-900/30 transition transform hover:scale-102 cursor-pointer"
             >
               <Radio className="w-4 h-4 text-emerald-300 animate-pulse" />
-              <span>Open Live Talk Mode</span>
+              <span>Live Talk Mode</span>
             </button>
           </div>
 
@@ -317,13 +408,29 @@ export default function AssistantPage() {
                     <p className="whitespace-pre-line">{m.content}</p>
 
                     {!isUser && (
-                      <button
-                        onClick={() => speakText(m.content)}
-                        className="mt-3 inline-flex items-center gap-1.5 text-xs text-sky-300 hover:text-sky-200 font-bold bg-slate-700/60 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-600 cursor-pointer"
-                      >
-                        <Volume2 className="w-4 h-4" />
-                        <span>Read Out Loud</span>
-                      </button>
+                      <div className="mt-3 flex items-center gap-2">
+                        {isSpeaking && speakingMessageId === m.id ? (
+                          <button
+                            type="button"
+                            onClick={stopSpeaking}
+                            className="inline-flex items-center gap-1.5 text-xs text-rose-300 hover:text-white font-bold bg-rose-950/80 hover:bg-rose-900 px-3 py-1.5 rounded-lg border border-rose-600 cursor-pointer animate-pulse"
+                            aria-label="Stop reading response aloud"
+                          >
+                            <Square className="w-3.5 h-3.5 fill-current" />
+                            <span>Stop Speaking</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => speakText(m.content, m.id)}
+                            className="inline-flex items-center gap-1.5 text-xs text-sky-300 hover:text-sky-200 font-bold bg-slate-700/60 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-600 cursor-pointer"
+                            aria-label="Read response aloud"
+                          >
+                            <Volume2 className="w-3.5 h-3.5" />
+                            <span>Read Out Loud</span>
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -333,7 +440,7 @@ export default function AssistantPage() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Text Input Fallback Bar */}
+        {/* Text Input Fallback Bar with Instant Stop Speaking Control */}
         <div className="bg-slate-900 border border-slate-800 p-2 sm:p-3 rounded-2xl flex items-center gap-2">
           <input
             type="text"
@@ -343,6 +450,20 @@ export default function AssistantPage() {
             placeholder="Type your question or request..."
             className="flex-1 bg-transparent px-4 py-2.5 text-white text-base sm:text-lg placeholder-slate-500 focus:outline-none"
           />
+
+          {isSpeaking && (
+            <button
+              type="button"
+              onClick={stopSpeaking}
+              className="p-3 bg-rose-600 hover:bg-rose-500 text-white rounded-xl shadow cursor-pointer transition flex items-center gap-1.5 px-3.5 font-bold text-sm animate-pulse"
+              title="Stop assistant speaking"
+              aria-label="Stop assistant speaking"
+            >
+              <Square className="w-4 h-4 fill-current" />
+              <span className="hidden sm:inline">Stop</span>
+            </button>
+          )}
+
           <button
             onClick={() => handleSendMessage()}
             disabled={!inputText.trim() || isSending}
@@ -364,17 +485,27 @@ export default function AssistantPage() {
                 Gemini Live Voice Active
               </span>
             </div>
-            <button
-              onClick={() => {
-                if (typeof window !== "undefined" && "speechSynthesis" in window) {
-                  window.speechSynthesis.cancel();
-                }
-                setIsLiveTalkOpen(false);
-              }}
-              className="p-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer"
-            >
-              <X className="w-6 h-6" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleTalkAloud}
+                className="px-3 py-1.5 rounded-xl bg-slate-800 text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1.5 transition"
+                aria-label="Toggle voice output"
+              >
+                {talkAloud ? <Volume2 className="w-4 h-4 text-emerald-400" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
+                <span>{talkAloud ? "Voice ON" : "Voice Muted"}</span>
+              </button>
+              <button
+                onClick={() => {
+                  stopSpeaking();
+                  setIsLiveTalkOpen(false);
+                }}
+                className="p-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer"
+                aria-label="Close Live Talk"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
           </div>
 
           {/* Central Animated Visualizer */}
@@ -387,7 +518,7 @@ export default function AssistantPage() {
                     : liveTalkStatus === "thinking"
                     ? "bg-gradient-to-tr from-purple-600 to-indigo-600 shadow-2xl shadow-purple-500/50 animate-pulse"
                     : liveTalkStatus === "speaking"
-                    ? "bg-gradient-to-tr from-sky-500 to-indigo-500 shadow-2xl shadow-sky-500/50 scale-105"
+                    ? "bg-gradient-to-tr from-rose-500 to-amber-500 shadow-2xl shadow-rose-500/50 scale-105"
                     : "bg-slate-800 border-2 border-slate-700"
                 }`}
               >
@@ -406,45 +537,57 @@ export default function AssistantPage() {
               {liveTalkStatus === "listening" && (
                 <div className="absolute inset-0 rounded-full border-4 border-emerald-400/50 animate-ping pointer-events-none" />
               )}
+              {liveTalkStatus === "speaking" && (
+                <div className="absolute inset-0 rounded-full border-4 border-rose-400/50 animate-ping pointer-events-none" />
+              )}
             </div>
 
             <h3 className="text-2xl sm:text-3xl font-black text-white mb-2">
               {liveTalkStatus === "listening"
                 ? "Listening to you..."
                 : liveTalkStatus === "thinking"
-                ? "Reasoning with care context..."
+                ? "Thinking calmly..."
                 : liveTalkStatus === "speaking"
-                ? "Speaking with Margaret..."
+                ? "Speaking aloud..."
                 : "Tap the button below to speak"}
             </h3>
             <p className="text-slate-400 text-sm max-w-sm mx-auto">
               {activeMode === "extended"
-                ? "Operating in Extended Thinking mode with longitudinal clinical grounding."
-                : "Operating in Live Conversational mode."}
+                ? "Extended Thinking mode active."
+                : "Live Conversational mode active."}
             </p>
           </div>
 
-          {/* Bottom Voice Triggers */}
-          <div className="w-full max-w-md flex flex-col items-center gap-4">
-            <button
-              onClick={startLiveTalkSpeech}
-              disabled={liveTalkStatus === "thinking"}
-              className="w-full min-h-[64px] bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xl font-black rounded-2xl shadow-xl flex items-center justify-center gap-3 cursor-pointer"
-            >
-              <Mic className="w-7 h-7" />
-              <span>{liveTalkStatus === "listening" ? "Listening..." : "Tap to Speak"}</span>
-            </button>
+          {/* Bottom Voice Triggers & Stop Speaking Controls */}
+          <div className="w-full max-w-md flex flex-col items-center gap-3">
+            {liveTalkStatus === "speaking" ? (
+              <button
+                onClick={stopSpeaking}
+                className="w-full min-h-[64px] bg-rose-600 hover:bg-rose-500 text-white text-xl font-black rounded-2xl shadow-xl shadow-rose-900/50 flex items-center justify-center gap-3 cursor-pointer animate-pulse transition"
+                aria-label="Stop speaking response"
+              >
+                <Square className="w-7 h-7 fill-current" />
+                <span>Stop Speaking</span>
+              </button>
+            ) : (
+              <button
+                onClick={startLiveTalkSpeech}
+                disabled={liveTalkStatus === "thinking"}
+                className="w-full min-h-[64px] bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xl font-black rounded-2xl shadow-xl flex items-center justify-center gap-3 cursor-pointer transition"
+              >
+                <Mic className="w-7 h-7" />
+                <span>{liveTalkStatus === "listening" ? "Listening..." : "Tap to Speak"}</span>
+              </button>
+            )}
 
             <button
               onClick={() => {
-                if (typeof window !== "undefined" && "speechSynthesis" in window) {
-                  window.speechSynthesis.cancel();
-                }
+                stopSpeaking();
                 setIsLiveTalkOpen(false);
               }}
-              className="text-slate-400 hover:text-white text-sm font-bold"
+              className="text-slate-400 hover:text-white text-sm font-bold transition py-2"
             >
-              Return to Text Chat
+              Close & Return to Chat
             </button>
           </div>
         </div>
