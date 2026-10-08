@@ -10,11 +10,17 @@ import { apiClient } from "@/lib/api";
 import { Phone, Shield, ArrowLeft, HeartPulse, User } from "lucide-react";
 
 export default function SafetyPage() {
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
   const [patient, setPatient] = useState<PatientDetail | null>(null);
 
   const patientId = user?.patient_profile?.id;
+
+  useEffect(() => {
+    if (!isAuthLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, isAuthLoading, router]);
 
   useEffect(() => {
     const fetchPatient = async () => {

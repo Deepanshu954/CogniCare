@@ -9,10 +9,16 @@ import { apiClient } from "@/lib/api";
 import { Brain, Sparkles, Clock, Eye, Layers, ArrowLeft } from "lucide-react";
 
 export default function ActivitiesCatalogPage() {
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
   const [activities, setActivities] = useState<CognitiveActivity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!isAuthLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, isAuthLoading, router]);
 
   useEffect(() => {
     const fetchActivities = async () => {

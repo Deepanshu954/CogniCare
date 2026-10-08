@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
@@ -10,6 +10,7 @@ import { Brain, Heart, Shield, Activity, Users, Sparkles, CheckCircle2 } from "l
 export default function LandingPage() {
   const { user, quickLogin } = useAuth();
   const router = useRouter();
+  const [loadingAccount, setLoadingAccount] = useState<"margaret" | "sarah" | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -22,6 +23,7 @@ export default function LandingPage() {
   }, [user, router]);
 
   const handleQuickLogin = async (account: "margaret" | "sarah") => {
+    setLoadingAccount(account);
     try {
       const loggedUser = await quickLogin(account);
       if (loggedUser.role === "ELDERLY") {
@@ -31,6 +33,7 @@ export default function LandingPage() {
       }
     } catch (e) {
       console.error("Quick login error:", e);
+      setLoadingAccount(null);
     }
   };
 
@@ -64,19 +67,31 @@ export default function LandingPage() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <button
+              type="button"
+              disabled={loadingAccount !== null}
               onClick={() => handleQuickLogin("margaret")}
-              className="min-h-[72px] bg-sky-600 hover:bg-sky-500 text-white font-extrabold text-lg px-6 py-4 rounded-2xl border-2 border-sky-300 shadow-lg shadow-sky-900/40 transition-transform active:scale-95 flex items-center justify-center gap-3 cursor-pointer"
+              className={`min-h-[72px] bg-sky-600 hover:bg-sky-500 text-white font-extrabold text-lg px-6 py-4 rounded-2xl border-2 border-sky-300 shadow-lg shadow-sky-900/40 transition-transform active:scale-95 flex items-center justify-center gap-3 cursor-pointer ${
+                loadingAccount !== null ? "opacity-75 cursor-not-allowed" : ""
+              }`}
             >
               <Heart className="w-6 h-6 text-rose-300" />
-              <span>Enter as Margaret (Senior)</span>
+              <span>
+                {loadingAccount === "margaret" ? "Opening Senior Portal..." : "Enter as Margaret (Senior)"}
+              </span>
             </button>
 
             <button
+              type="button"
+              disabled={loadingAccount !== null}
               onClick={() => handleQuickLogin("sarah")}
-              className="min-h-[72px] bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-lg px-6 py-4 rounded-2xl border-2 border-indigo-300 shadow-lg shadow-indigo-900/40 transition-transform active:scale-95 flex items-center justify-center gap-3 cursor-pointer"
+              className={`min-h-[72px] bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-lg px-6 py-4 rounded-2xl border-2 border-indigo-300 shadow-lg shadow-indigo-900/40 transition-transform active:scale-95 flex items-center justify-center gap-3 cursor-pointer ${
+                loadingAccount !== null ? "opacity-75 cursor-not-allowed" : ""
+              }`}
             >
               <Users className="w-6 h-6 text-sky-300" />
-              <span>Enter as Sarah (Caregiver)</span>
+              <span>
+                {loadingAccount === "sarah" ? "Opening Caregiver Tower..." : "Enter as Sarah (Caregiver)"}
+              </span>
             </button>
           </div>
           <p className="text-xs text-slate-500 mt-3">

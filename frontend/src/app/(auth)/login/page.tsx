@@ -123,15 +123,17 @@ export default function LoginPage() {
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
+                disabled={isLoading}
                 onClick={() => handleQuickDemo("margaret")}
-                className="py-2.5 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 border border-slate-700 cursor-pointer"
+                className="py-2.5 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-60 text-xs font-bold text-slate-300 border border-slate-700 cursor-pointer"
               >
                 Margaret (Senior)
               </button>
               <button
                 type="button"
+                disabled={isLoading}
                 onClick={() => handleQuickDemo("sarah")}
-                className="py-2.5 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 border border-slate-700 cursor-pointer"
+                className="py-2.5 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-60 text-xs font-bold text-slate-300 border border-slate-700 cursor-pointer"
               >
                 Sarah (Caregiver)
               </button>

@@ -11,13 +11,19 @@ import { ArrowLeft } from "lucide-react";
 
 export default function PlayActivityPage() {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
 
   const [activity, setActivity] = useState<CognitiveActivity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const patientId = user?.patient_profile?.id;
+
+  useEffect(() => {
+    if (!isAuthLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, isAuthLoading, router]);
 
   useEffect(() => {
     const fetchActivity = async () => {

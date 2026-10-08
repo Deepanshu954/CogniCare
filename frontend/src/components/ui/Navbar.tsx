@@ -156,16 +156,53 @@ export const Navbar: React.FC = () => {
                 </div>
             </>
           ) : (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* UI Scale Switcher */}
+              <div className="flex items-center bg-slate-800/80 rounded-lg p-0.5 border border-slate-700/80 text-xs font-semibold" title="Display & Touch Sizing">
+                <button
+                  type="button"
+                  onClick={() => setScale("normal")}
+                  className={`px-2 py-1 rounded-md transition ${
+                    scale === "normal"
+                      ? "bg-sky-600 text-white shadow-sm font-bold"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  Normal
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setScale("large")}
+                  className={`px-2 py-1 rounded-md transition ${
+                    scale === "large"
+                      ? "bg-sky-600 text-white shadow-sm font-bold"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  Large
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setScale("extra-large")}
+                  className={`px-2 py-1 rounded-md transition ${
+                    scale === "extra-large"
+                      ? "bg-sky-600 text-white shadow-sm font-bold"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  XL Senior
+                </button>
+              </div>
+
               <Link
                 href="/login"
-                className="text-sm font-semibold text-slate-200 hover:text-white px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition"
+                className="text-sm font-semibold text-slate-200 hover:text-white px-3 sm:px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 transition"
               >
                 Sign In
               </Link>
               <Link
                 href="/register"
-                className="text-sm font-semibold text-white px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 transition shadow-md shadow-sky-600/20"
+                className="hidden sm:inline-block text-sm font-semibold text-white px-3 sm:px-4 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 transition shadow-md shadow-sky-600/20"
               >
                 Get Started
               </Link>
