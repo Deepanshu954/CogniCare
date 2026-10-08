@@ -22,6 +22,11 @@ async def lifespan(app: FastAPI):
         try:
             Base.metadata.create_all(bind=engine)
             logger.info("Database schemas verified.")
+            try:
+                from app.db.seed import seed_database
+                seed_database()
+            except Exception as se:
+                logger.warning(f"Auto-seed check notice: {se}")
             break
         except Exception as e:
             if attempt == 10:
