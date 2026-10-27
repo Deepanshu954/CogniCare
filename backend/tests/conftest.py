@@ -1,3 +1,8 @@
+import os
+# Ensure test suite runs in isolated in-memory SQLite regardless of local .env configuration
+os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+os.environ["APP_ENV"] = "testing"
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine

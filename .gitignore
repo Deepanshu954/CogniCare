@@ -41,6 +41,8 @@ htmlcov/
 .nox/
 coverage.xml
 *.cover
+coverage/
+frontend/coverage/
 
 # Database
 *.db

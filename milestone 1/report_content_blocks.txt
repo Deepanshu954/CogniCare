@@ -1,0 +1,370 @@
+=== BLOCK 1 (175 words) ===
+
+BENNETT UNIVERSITY
+
+SCHOOL OF ENGINEERING & APPLIED SCIENCES
+
+DEPARTMENT OF COMPUTER SCIENCE & ENGINEERING
+
+CSET400C – CAPSTONE PROJECT REPORT
+
+Academic Session 2026–27 | Semester VII B.Tech. CSE
+
+MILESTONE 1: PROJECT PROPOSAL, REQUIREMENTS & FEASIBILITY
+
+CogniCare: Ambient Elderly Cognitive & Routine Care Companion
+
+SUBMITTED BY:
+
+UNDER THE SUPERVISION & GUIDANCE OF:
+
+Project Guide / Faculty Mentor: Amit Chauhan
+
+Course Coordinator: Dr. Jabir Ali
+
+School of Engineering & Applied Sciences, Bennett University, Greater Noida, UP
+
+Date of Submission: October 18, 2026
+
+DECLARATION OF ORIGINALITY
+
+We hereby declare that this Milestone 1 Project Proposal titled “CogniCare: Ambient Elderly Cognitive & Routine Care Companion” is an accurate representation of genuine research, engineering, and design performed by our team as part of CSET400C (Capstone Project) at Bennett University in the academic session of 2026-27.
+
+Numerous relevant source materials published on geriatrics, laws on accessibility, as well as different software libraries, have been cited correctly.
+
+This project has never been submitted for any other academic purpose anywhere else.
+
+Student Signatures & Authentication:
+
+•  1. Deepanshu Chauhan (E23CSEU1617) — System Architecture, AI Orchestration & Backend Infrastructure
+
+
+=== BLOCK 2 (176 words) ===
+• 2. Yash (E23CSEU1493) – Frontend Architecture, Accessibility Engineering, and Interactive Activities
+• 3. Piyush (E23CSEU0853) – Relational Database Design, State Machines, and Quality Verification
+
+EXECUTIVE SUMMARY
+The current trend of increasing population of elderly nations indicates that more than 55 million elderly people are combating with dementia or mild cognitive impairment.
+
+The cognitive weakness of the elderly results in missed schedules and ignored medications.
+
+Unfortunately, due to their memory lapses, the elderly tend to forget vital medications or take them in high dosages.
+
+There is an equally hard situation in the case of informal caregivers (usually adult children living separately from their elderly parents), who face chronic fatigue brought on by the approximately 65 hours of caregiver supervision weekly without knowledge about the current situation.
+
+Existing solutions are unable to tackle the problem.
+
+Commercial brain training programs such as Lumosity put pressure and anxiety on patients without any control over the caregiving process while medical reminder software does not cater to the elderly; robotic devices like ElliQ cost hundreds of dollars.
+=== BLOCK 3 (175 words) ===
+CogniCare, the open-source Progressive Web App, will resolve the issue. It includes a plethora of easily utilized and convenient visual designs that are user-friendly for older adult users and an ambient monitoring system intended for caregivers. 
+
+CogniCare leverages FastAPI in Python, Next.js 14 App Router, PostgreSQL 16, along with Google Gemini 3.8 AI technology and real-time local fallback engine. 
+
+The application is entirely containerized inside suitable containers complying with the United Nations' Sustainable Development Goal 3 & 10 and having a certificate of automation for testing.
+
+
+•  First Stage: Problem Definition, Clinical Framework & Motivation  ................................................  Page 3
+
+
+•  Second Stage: UN's Sustainable Development Goals and Use of Ethical AI Principles  ................................................  Page 4
+
+
+•  Third Stage: Survey of Literature and Benchmarking of Research Gap  ................................................  Page 5
+
+
+•  Fourth Stage: Stakeholders, Persona Creation, and Identification of Requirements  ................................................  Page 7
+
+
+•  Fifth Stage: Proposed Architecture, Data Flow, and Scoring  ................................................  Page 8
+
+
+•  Sixth Stage: Analysis of Feasibility and Risk Management Plan  ................................................  Page 10
+
+
+•  Seventh Stage: Milestone Plan, Allocation of Duties and Predicted Results  ................................................  Page 11
+
+=== BLOCK 4 (173 words) ===
+
+•  References (IEEE Academic Citation Format)  ................................................  Page 11
+The global population of dementia cases exceeds 55 million according to WHO and an additional 10 million cases are diagnosed on a yearly basis. 
+
+An estimated 15% – 20% of aged people (aged 65 and above) are diagnosed with Mild Cognitive Impairment (MCI). It signifies the stage when cognitive function is deteriorating and the patient is able to perform only basic self-care activities independently and needs help with more complicated tasks (like taking medication). 
+
+Modern families became dispersed with adult children often living in different cities and working busy schedules which makes elderly parents live on their own. 
+
+Such a situation creates problems and distress because feelings being expressed in telephone conversations do not allow one to obtain real evidence of the problem and declines are hardly noticed until something really bad has happened.
+
+=== BLOCK 5 (141 words) ===
+When aged people have serious memory problems, they end up forgetting their medication.
+According to scientific research in the area of geriatric medicine, more than fifty percent of aged people suffering from some chronic condition do not take their medication, as prescribed. Most prescriptions are not complied with due to the fact that older people cannot remember the proper routine.
+Consequently, this leads to the situation when patients suffer from heart attack, stroke, and increased blood pressure.
+The problem becomes even more serious with the digital divide.
+Programs that people use now are designed for the latest generation of consumers and are difficult to navigate, as they involve such elements as tiny text, design icons, and rapid animation.
+1.3 The burden of caregivers and lack of information
+An informal caregiver is a second person suffering in this scenario, as they have to take care of the patients at least for 65 hours every week, help them in emergencies, refill the prescriptions, and perform many other functions.
+
+=== BLOCK 6 (137 words) ===
+An informal caregiver will be unaware of what condition their loved one is in because any questions posed will result in replies such as "Yes, I took my medication!" since the patient is reluctant to give any burden to their child or show weakness.
+
+1.4 Formal Capstone Problem Statement
+
+“Individuals suffering from mild cognitive impairment deal with several issues like disrupted daily living activities, serious incidents of non-compliance with taking medications, and frustration caused by new technology while their family caregivers experience chronic mental exhaustion in addition to the lack of information about their loved one’s daily routine.”
+
+The project objective is to develop an application that connects a user-friendly voice-enabled senior assistant with technology-enabled control over an informal caregiver.
+
+CHAPTER 2 – UN SDG ALIGNMENT & ETHICAL GUARDRAILS
+
+2.1 Alignment with UN Sustainable Development Goal 3 (Good Health & Well-Being)
+
+
+=== BLOCK 7 (155 words) ===
+CogniCare’s offerings perfectly match the UN SDG Target 3.4. According to this target, states ought to reduce by a third the rate of untimely deaths due to non-communicable diseases by 2030 through preventive measures and methods of treatment along with determining progress in mental health and well-being.
+
+CogniCare helps accomplish this goal in three specific ways:
+
+•  • Cognitive Longevity. By means of non-intrusive memory and attention exercises, the device achieves cognitive longevity. 
+
+•  • Preventive Chronic Care. Certain reminders will help ensure that a person takes medications 90% of the time thus avoiding any cardiovascular and diabetes crises.
+
+•  • Combatting Social Isolation. A friendly conversational bot keeps the isolated and depressed elder people company.
+
+2.2 Satisfaction of the UN Sustainable Development Goal 10 (Reduced Inequalities)
+
+CogniCare aims to meet the UN SDG Target 10.2 “Ensure equal opportunities and reduce inequalities in the results.”
+
+=== BLOCK 8 (161 words) ===
+•  • Universal Accessibility: It is completely compliant with WCAG 2.2 AA standards; its touch buttons have a minimum size of 76 px and the color contrast has a ratio of at least 7:1.
+
+•  • Multi-Size Viewport Engine: There are 3 densities: normal (100 %), large (115 %) and extra-large (130 %), meaning that the information is accessible depending on the user’s ability to see or move around.
+
+•  • Integration: PWA operates on regular and inexpensive tablets and doesn’t need costly exclusive biomachines.
+
+2.3 Responsible Healthcare AI & Clinical Safety Standards
+
+In the area of geriatric care, the use of AI should be guided by strict protocols in order to remain ethical:
+
+1. Non-Diagnostic Restriction: CogniCare acts as a helper in daily activities; it does not provide any medical diagnosis, prevention or prescriptions.
+
+
+=== BLOCK 9 (155 words) ===
+•  2. Principles of Validation Therapy: Interaction reflects the principles of validated geriatric therapy including validating feelings, no contradiction in presenting facts, and the same soft factor in conversation flow.
+
+•  3. Program for Zero Hallucination: The cognitive performance levels are calculated using simple mathematical equations ruling out the likelihood of reporting the wrong clinical performance metrics.
+
+•  4. Consent and Data Protection: According to HIPAA, and GDPR regulations no user or caregiver can access information without an authorized token. Moreover, all user activities are recorded in secured logs to ensure the accuracy of this data. 
+
+CHAPTER 3 – THE REVIEW OF LITERATURE AND COMPETITIVE ANALYSIS
+
+
+3.1. Critical Analysis of Current Market Solutions 
+
+The researchers carried out a thorough investigation of market software products available on the market to identify three basic categories of interventions existing in the market:
+
+
+=== BLOCK 10 (176 words) ===
+•  1. Applications for Improving Brain Function (Lumosity, Elevate, Peak): These applications aim to enhance cognitive function in general but are suitable for tech-savvy youngsters. These applications include a timer functionality, notification features in case of mistakes, and complicated information flow, resulting in anxiety for users especially for the elderly users affected by the mild cognitive impairment. Importantly, the applications do not help the individual’s family members to participate in or integrate the stimulating process in the client’s life. 
+
+•  2. Applications for Reminders about Taking Medications (Medisafe, CareZone):These applications serve as reminders about medication fulfillment for younger patients with chronic illnesses. However, the application is characterized by an excessive number of texts in tiny font and complex procedure of multiple confirmation steps. As a result, senior citizens sometimes deactivate notifications accidentally or give up after facing problems with the applications. 
+
+•  3. Specialized Robots: (ElliQ, Carely): These robots offer pre-prepared interfaces for entertainment and activities. However, the cost is high (about 500 dollars for the device and from 40 to 60 dollars for maintenance).
+
+As a result, the offered solutions include either anxiety-inducing commercial applications, inefficient medication reminding applications, or pricey robot helpers.
+
+
+=== BLOCK 11 (176 words) ===
+The absence of a perfect platform is still evident 
+
+3.2 Academic Benchmarking Matrix 
+
+In table 3.1, the technical, clinical, and accessibility potentials of current solutions were compared to CogniCare. 
+
+3.3 Discovery of the Key Research and Technical Shortcoming 
+
+The examination we conducted showed that there is a noticeable difference between the structure and functionality of health IT technology. 
+
+"No software that has open standards has complete WCAG 2.2 AA access for elderly people and reliable monitoring of who takes what medication, who needs cognitive training, and who monitors caregivers’ activities, and it is also available at a reasonable price for everyone." 
+
+CogniCare fills this gap. 
+
+Combining accessibility for engaging seniors, constant monitoring of daily activities, and smart mentoring for caregivers, the company offers the first prototype for elderly care solutions within a single open and easy-to-make technology. 
+
+CHAPTER 4 – PERSONAS OF PARTICIPANTS AND NEEDS ANALYSIS 
+
+4.1 Personas of the Participants עולם 
+
+•  Primary Persona (Senior): Margaret (76, Retired Teacher): Suffering from mild stage of MCI and cataracts, has schismatic tremor. Lives alone. Forgets to take pills in the afternoon and afraid of the multi-layered application. Has to have the application with simple touch screen, easy “Day” routine function, option to hear and to mute voice
+
+
+=== BLOCK 12 (169 words) ===
+• Secondary Persona (Caregiver): Sarah (48, Marketing Director at a corporation): Margaret's daughter and primary caregiver. Works in a demanding job and family while taking care of her mother’s needs. Suffers from ongoing worries over missing medications. Requires timely verification of the daily schedule, objective 14/30 day cognitive progress, and alerts about missed important appointments.
+• Tertiary Stakeholders: Clinicians and Administrators: Geriatric doctors in need of lifelong accuracy and distribution of time delays; system administrators in need of separated roles and the capability of performing immutable auditing.
+4.2 Functional Requirements Specification (FR)
+• FR-01: Identity and Role-Based Access Control: Introduction of secure authenticating with the help of JWT providing different views for Senior, Caregiver, and Admin via HTTP-only cookies.
+• FR-02: Patient-Caregiver Consent Linking: Securing account linking through token invitations and clearly defined rights for access (view only; full administration).
+• FR-03: Medication and Routine Scheduling: Keeping track of time and dose of medicine as well as guidelines and significance level.
+• FR-04: Reliable Reminder Engine: Keeping reminding states such as SCHEDULED, TRIGGERED, ACKNOWLEDGED, SNOOZED, and MISSED with automatic escalation to a caregiver.
+• FR-05: Cognitive Activity Catalog: Providing tested exercises (Memory Recall, Word Sequence, Attention Stroop) with the adjustment of difficulty level.
+
+
+=== BLOCK 13 (166 words) ===
+•  FR-06: Deterministic Scoring Telemetry: Establish methods for determining action points via developed equations, which are based upon accuracy and latency indicators, with the use of rolling longitudinal baselines. 
+
+•  FR-07: Dual-Mode Gemini AI Orchestration: Provide validation therapy discussion in support of both Gemini 3.8 live version (proficient voice/chat) and Advanced Thinker (deep thinking).
+
+•  FR-08: Emergency SOS Dispatch: Enable easy-to-press button for dispatching of instant security notification to help providers being connected to patients. 
+
+4.3 Non-Functional Requirements Specification (NFR)
+
+•  NFR-01: Compliance with WCAG 2.2 AA: The minimal ratio of the contrast between the colors should be 7:1; it must not be less than 76 px; every location must have particular landmarks for ARIA screen-reader.
+
+•  NFR-02: Less than 500ms of Latency & Fallback: Latency while returning the API response should be less than 500 milliseconds; if the cloud does not respond, the AI assistant should respond locally at least in 100 milliseconds.
+
+•  NFR-03: Availability of Offline Mode & PWA Caching: Cache the crucial daily routines as well as cognitive games by means of service workers for the purpose of the offline functionality. 
+
+•  NFR-04: Multi-Scaled Viewport: Offer 3 responsive viewports  (common 100%, big 115%, extra-large 130%), which are compatible with mobile devices and desktop computers.
+CHAPTER 5 – PROPOSED METHODOLOGY & SYSTEM ARCHITECTURE
+
+5.1 Four-Tier Modular Monolith Architecture
+
+CogniCare is designed as a modular monolith with four tiers.
+
+=== BLOCK 14 (164 words) ===
+
+Modular monolith was intentionally preferred over microservices without having inter-service network latency; ensuring strict ACID relational transactions in severe medication events; deploying easily in standard servers.
+
+• 1. Presentation Layer (Client): Built on Next.js 14 App Router, TypeScript, Tailwind CSS, and Web Speech API. Provides server-rendered initial loads, responsive PWA caching, and multi-scale accessibility viewports.
+
+• 2. API & Routing Layer: FastAPI asynchronous ASGI application exposing RESTful routes (/api/v1), Pydantic v2 data validation schemas, and automated OpenAPI documentation.
+
+• 3. Domain Service Layer: Encapsulates business logic for deterministic mathematical scoring, finite state machine transitions, authentication guards, and AI model routing.
+
+• 4. Persistence & AI Tier: PostgreSQL 16 relational database managed through SQLAlchemy 2.0 ORM and Alembic migrations along with Google Gemini 3.8 AI and immediate local fallback engine.
+
+5.2 Architectural Trade-Off Analysis: Modular Monolith vs. Microservices
+
+In the healthcare routine tracking sector, dependability and data integrity are important.
+
+Microservice architecture leads to distributed transaction overhead, risks related to eventual consistency, and intricate network partitions.
+
+
+=== BLOCK 15 (168 words) ===
+Once confirmation of the blood pressure medication by the senior occurs, the record of such confirmation must be made without delay and automated.
+
+
+
+Our architecture based on modular monolith promises zero-latency internal computation while producing an absolute assurance of ACID conditions while preserving strict encapsulations of internal boundaries in auth, care, and telemetry environment.
+
+
+
+5.3 Deterministic finite state machines in medication reminders and safety alerting solutions
+
+
+
+As part of ensuring patient safety, alerts and reminders are based on deterministic finite state machines rather than on non-deterministic AI decisions:
+
+
+
+[SCHEDULED]  ──────────►  [TRIGGERED]
+      │                          │
+      ▼                          ▼
+[SNOOZED]                 [ACKNOWLEDGED]
+      │                          │
+      └──────────────────►  [MISSED]  ──────────►  [CRITICAL CAREGIVER ALERT]
+
+If the scheduled critical medication was not acknowledged in a timestamp configured  (30 minutes for example) then the system sends the alert to caregivers with all contextual information about the moment when it was missed.
+
+
+
+5.4 Deterministic closed mathematical scoring engine
+
+
+
+One of the main ethical principles of CogniCare is that cognitive performance metrics should never depend on generative AI which is subject to hallucinations or stochastic variability. 
+
+
+
+As a result, every cognitive session is scored by deterministic obedient math formula.
+
+=== BLOCK 16 (151 words) ===
+The score is calculated using the formula: Score = round(100 × (0.60 × Accuracy + 0.40 × LatencyFactor) × DifficultyWeight). Herein, Accuracy refers to the correct response ratio ranging from 0.0 to 1.0, and LatencyFactor accounts for timely responses. The valid range for LatencyFactor is within between 0.20 and 1.0. With respect to this formula, the DifficultyWeight factor is multiplied by specific rates depending on the difficulty levels (Easy: 0.80, Medium: 1.00, Hard: 1.20).
+
+The calculated scores are summed up based on the passing periods of 14 or 30 days, allowing health caregivers and specialists to receive 100% mathematical results on the changing trends in time.
+
+5.5 Dual-Mode Gemini AI Orchestrator & Resilient Local Fallback Engine.
+
+The conversational assistant employs an AI provider interface that provides the dual operating mode function.
+
+• 1. Gemini 3.8 Live — Normal Mode: This AI is powered by Gemini 3.8 Live (gemini-2.0-flash); hence, it can provide timely and compassionate responses during communication sessions.
+
+• 2. Extended Thinking — Extended Thinking Mode: This AI operates based on the Gemini 3.8 Live system using extended thinking principles, thus allowing deep analysis of the caregiver's reports regarding completed daily tasks.
+
+
+=== BLOCK 17 (163 words) ===
+Firstly, the Resilient Fallback, which is the Resilient Local Fallback Engine, is useful in the event of cloud API rate limit errors or disruptions to network services. It intercepts any failure automatically and provides reassuring, contextually relevant messages locally to ensure that operations are up and running regardless of the circumstances.
+
+A dual-mode approach, which means a combination of conversational warmth and the analytical depth required for this type of mission, is provided by this method.
+
+Chapter 6: Feasibility Analysis and Risk Management
+
+6.1 Feasibility Assessment Using Four Pillars 
+
+The first pillar involves the Technical Feasibility: FastAPI in Python, Next.js version 14, and PostgreSQL version 16 are advanced technologies that have been successfully integrated into many projects before. In this particular case, the app runs smoothly within the confines of Docker and has been passed successfully by numerous automated tests, 100 percent of which were successful in terms of both the backend and the frontend testing.
+
+Secondly, the Economic Feasibility is above high. The app uses only open-source libraries. Cloud VPS can be used at a price of $5 to $10 per month, and there is no need to purchase any proprietary hardware.
+
+The third pillar of Operational feasibility: Users will require no special
+
+
+=== BLOCK 18 (168 words) ===
+• 4. Compliance in terms of Legal & Ethical Feasibility: Abides by the principles of data segregation from HIPAA and GDPR, maintains records of explicit consent and establishes the clinical limits for diagnostics. 
+
+
+6.2 Elaborate Risk Register and Practical Engineering Solutions 
+
+
+Table 6.1 contains the details of the risk registry for the project, severity grading and technologies for mitigation. 
+
+
+CHAPTER 7 – PROJECT PLAN, ALLOCATION OF WORK, AND RESULTS 
+
+
+7.1 Milestones Table for Capstone Project. 
+
+
+• Milestone 0 (Completed – Aug 2026): Identification of the cause of the problem, preparations for team charter, adherence to UN SDGs, and study of the subject area in clinical domain. 
+
+
+• Milestone 1 (In Progress – Oct 2026, 30 Marks): Full-fledged proposal, objectives from the literature review, composition of architecture, formulation of requirements and preparation of project presentation. 
+
+
+• Milestone 2 (To Come – Nov 2026, 30 Marks): Working prototype, list of activities, dual-mode AI solutions and testing for users. 
+
+
+• Final Presentation (Up Next – Dec 2026, 40 Marks): Comprehensive production report, live demonstration before the committee and technical defense. 
+
+
+7.2 Breakdown of Team Responsibilities (WBS) 
+• 1. Deepanshu Chauhan (Team Leader – E23CSEU1617): End-to-end architectural design, Docker containerization, development of FastAPI asynchronous core, integration of Google Gemini AI and development of resilient fallback engine.     
+
+=== BLOCK 19 (279 words) ===
+•   2. Yash (Team Member 1 – E23CSEU1493): The Next.js 14 App Router design of the front end of the application, various viewports, and interactive cognitive activity games ensuring compliance with WCAG 2.2 AA standards, and Marathon test suite.
+
+•  3. Piyush (Team Member 2 – E23CSEU0853): The PostgreSQL 16 relational database's structure and use of the SQLAlchemy 2.0 ORM models, safety and reminder states, the mathematical scoring engine, and the Pytest test suite.
+
+7.3 Expected Tangible Deliverables
+
+•  1. Software: A Docker-based full-stack application (FastAPI + Next.js + PostgreSQL) setup via Docker Compose that works with no manual setup.
+
+•  2. Documentation: The official report on milestone 1, slides for the 10 slide presentation, and the validated documentation for architecture.
+ 
+•  3. Quality: An automated test coverage of 100% on both backend and the frontend codes with proven flakiness resistance.
+
+References (IEEE Format)
+
+[1] World Health Organization, “Dementia: Key Facts and Global Impact,” WHO Guidelines Approved by the Guidelines Review Committee, Geneva, 2023.
+
+[2] Alzheimer's Association, “2024 Alzheimer’s Disease Facts and Figures,” Alzheimer’s & Dementia, vol. 20, no. 5, pp. 3708-3821, 2024.
+
+[3] Petersen, R.C, et al “Practice Guideline Update Summary: Mild Cognitive Impairment,” Neurology, vol 90, no. 3, pp. 126-135, 2018.
+
+[4] Sabaté, E. "Adherence to Long-term therapies: evidence for action,” World Health Organization, Geneva, 2003.
