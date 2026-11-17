@@ -8,6 +8,7 @@ import { PatientHeader } from "@/components/caregiver/PatientHeader";
 import { TrendChart } from "@/components/caregiver/TrendChart";
 import { AdherenceGauge } from "@/components/caregiver/AdherenceGauge";
 import { AlertList } from "@/components/caregiver/AlertList";
+import { MedicalDocumentSection } from "@/components/documents/MedicalDocumentSection";
 import {
   PatientDetail,
   PatientSummary,
@@ -299,6 +300,13 @@ export default function CaregiverDashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Medical Documents, Prescriptions & Condition Details (Drag and Drop enabled) */}
+        {selectedPatientId && (
+          <div className="mb-8">
+            <MedicalDocumentSection patientId={selectedPatientId} />
+          </div>
+        )}
 
         {/* Safety Alerts Feed */}
         <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-md">

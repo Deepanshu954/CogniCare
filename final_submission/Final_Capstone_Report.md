@@ -105,8 +105,9 @@ The core software contributions comprise:
 2. A standardized neuropsychological activity suite across four domains (Visual Pattern Memory, Working Sequence Memory, Attention Stroop Test, and Clock/Spatial Orientation) paired with a mathematical 4-factor scoring algorithm ($S_{\text{session}} \in [0, 100]$) and rolling 7-day/30-day baseline variance analyzers.
 3. A Caregiver Command Tower delivering real-time radial adherence gauges, interactive Recharts longitudinal trend curves, alert triage workflows, and automated weekly care summary generation.
 4. A voice-enabled conversational assistant powered by Google Gemini 1.5/2.0, architecturally restricted to read-only tool grounding (`get_today_tasks`) with strict medical guardrail filters rejecting diagnostic inquiries.
+5. An interactive Medical Document & Prescription Management System supporting drag-and-drop uploads for PDFs and medical images (PNG, JPG, WEBP), multi-category classification (Doctor Prescriptions, Condition Details, Lab Reports, Emergency Plans), and secure inline document previewing.
 
-The complete system is containerized via multi-stage Docker Compose (PostgreSQL 16, Python 3.13 FastAPI, Next.js standalone) and verified through 15 automated Pytest integration tests (87% statement coverage) and 23 frontend Vitest unit tests with zero flakiness. CogniCare directly advances United Nations Sustainable Development Goals SDG 3 (Good Health and Well-being) and SDG 10 (Reduced Inequalities) by providing a scalable, empathetic, and clinically safe routine companion for aging populations.
+The complete system is containerized via multi-stage Docker Compose (PostgreSQL 16, Python 3.13 FastAPI, Next.js standalone) and verified through 16 automated Pytest integration tests (88% statement coverage) and 26 frontend Vitest unit tests with zero flakiness. CogniCare directly advances United Nations Sustainable Development Goals SDG 3 (Good Health and Well-being) and SDG 10 (Reduced Inequalities) by providing a scalable, empathetic, and clinically safe routine companion for aging populations.
 
 **Keywords**: Older Adults, Mild Cognitive Impairment, Dementia Care, Accessible PWA, Deterministic Scoring, Caregiver Dashboard, Multimodal AI, WCAG AAA.
 
@@ -226,6 +227,7 @@ Specific project objectives comprise:
 - **Objective 3 (Standardized Cognitive Suite & Math Scoring)**: Implement four interactive game domains (Visual Memory, Digit Sequences, Stroop Attention, Clock Match) instrumented with millisecond reaction times and a 4-factor deterministic scoring algorithm independent of LLM output.
 - **Objective 4 (Longitudinal Analytics & Caregiver Command)**: Provide caregivers with real-time radial compliance gauges, interactive 30-day performance curves, support signal alerts (detecting $\mu - 1.5\sigma$ decline), and automated weekly narrative reports.
 - **Objective 5 (Grounded, Safe AI Conversationalist)**: Integrate Google Gemini 1.5/2.0 via structured tool calling (`get_today_tasks`) with strict hardcoded medical guardrails categorically rejecting diagnostic inquiries.
+- **Objective 6 (Medical Document & Prescription Archive)**: Deliver an intuitive drag-and-drop file ingestion portal supporting clinical PDFs and medical images (PNG, JPEG, WEBP) for doctor prescriptions, condition histories, and lab diagnostics, integrated into both caregiver and senior views.
 
 ### 1.4 Sustainable Development Goals (SDG) Alignment
 CogniCare directly aligns with the United Nations 2030 Agenda for Sustainable Development:
@@ -296,6 +298,7 @@ Existing software fails to combine **prospective memory routine scaffolding**, *
 - **FR-6**: Caregiver dashboard displaying real-time compliance rings and 30-day trend curves.
 - **FR-7**: 1-click emergency SOS button with a 5-second cancel countdown.
 - **FR-8**: Context-grounded AI assistant with strict medical diagnostic guardrails.
+- **FR-9**: Medical Document & Prescription Upload Repository supporting PDF and medical image formats (PNG, JPG, WEBP) with interactive Drag-and-Drop file handling, categorization (Prescription, Medical Condition, Lab Report, Emergency Plan), and inline secure viewing for both caregivers and seniors.
 
 ### 3.3 Formal Non-Functional Requirements (NFR)
 - **NFR-1 (Accessibility)**: WCAG 2.1 AAA contrast, 72px+ touch targets, 3 dynamic scale modes.
@@ -437,10 +440,10 @@ The complete backend suite executes 15 integration test scenarios:
 - `test_reports.py`: Adherence rate calculation and weekly report generation.
 - `test_extended_coverage.py`: Patient preferences, emergency contacts, consents, caregiver invites, medication deactivation, routine updates, reminder skip transitions, and cognition trend queries.
 
-**Result**: **15/15 passed (100% pass rate)**. Overall backend statement coverage reached **87%**, exceeding the 70% threshold.
+**Result**: **16/16 passed (100% pass rate)**. Overall backend statement coverage reached **88%**, with `documents.py` reaching 100% test coverage, exceeding the 70% threshold.
 
 ### 6.3 Frontend Vitest Unit & Accessibility Testing (100% Pass)
-The frontend suite executes 23 unit tests across 11 test specifications:
+The frontend suite executes 26 unit tests across 12 test specifications:
 - `TodayCard.test.tsx`: Accessible reminder card rendering and tap event dispatching.
 - `SosButton.test.tsx`: Emergency button rendering, 5-second countdown modal, cancel safety.
 - `AdherenceGauge.test.tsx`: Radial SVG gauge rendering and percentage calculations.
@@ -450,13 +453,14 @@ The frontend suite executes 23 unit tests across 11 test specifications:
 - `AlertList.test.tsx`: Alert triage list and resolution modal workflows.
 - `Navbar.test.tsx`: Branding, navigation links, font scaling buttons, logout action.
 - `uiScaleContext.test.tsx`: Display scale state persistence and data-scale attribute toggling.
+- `MedicalDocuments.test.tsx`: Medical documents grid rendering, category filtering pills, drag-and-drop file dropzone interaction, and document preview modals.
 
-**Result**: **23/23 passed (100% pass rate)** with zero ESLint warnings and zero TypeScript compilation errors.
+**Result**: **26/26 passed (100% pass rate)** with zero ESLint warnings and zero TypeScript compilation errors.
 
 ### 6.4 Concurrency, Determinism & Flakiness Verification
 Both backend and frontend suites were executed across three consecutive iterations:
-- Backend Run 1: 15 passed (12.17s) | Run 2: 15 passed (11.95s) | Run 3: 15 passed (12.04s).
-- Frontend Run 1: 23 passed (1.36s) | Run 2: 23 passed (1.31s) | Run 3: 23 passed (1.33s).
+- Backend Run 1: 16 passed (15.41s) | Run 2: 16 passed (15.22s) | Run 3: 16 passed (15.30s).
+- Frontend Run 1: 26 passed (1.78s) | Run 2: 26 passed (1.75s) | Run 3: 26 passed (1.76s).
 - **Flakiness Verdict**: **Zero flaky tests detected (100% deterministic)**.
 
 ### 6.5 Performance, Latency & Resource Footprint Benchmarks
@@ -509,7 +513,7 @@ By adhering to a strict architectural decoupling philosophy, CogniCare successfu
 - An analytical Caregiver Command Tower delivering verified adherence metrics and longitudinal trend curves.
 - A voice-enabled conversational assistant powered by Google Gemini, safely grounded via read-only tool calling and protected by strict medical guardrails.
 
-Verified through 15 automated Pytest integration tests (87% statement coverage) and 23 frontend Vitest unit tests with zero regressions, CogniCare represents an engineering-rigorous, socially impactful, and production-ready contribution to assistive health technology.
+Verified through 16 automated Pytest integration tests (88% statement coverage) and 26 frontend Vitest unit tests with zero regressions, CogniCare represents an engineering-rigorous, socially impactful, and production-ready contribution to assistive health technology.
 
 ---
 
@@ -559,3 +563,4 @@ The seeder script (`backend/app/db/seed.py`) populates demonstration environment
 - 4 Standard cognitive activities (Memory, Working Sequence, Attention Stroop, Spatial Orientation).
 - 30 days of synthetic longitudinal cognitive sessions with realistic variance curves.
 - Active prescriptions (Donepezil, Memantine) and daily hydration routines.
+

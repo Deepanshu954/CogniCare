@@ -6,6 +6,7 @@ from app.api.v1.cognition import activities_router, cognition_router
 from app.api.v1.assistant import router as assistant_router
 from app.api.v1.safety import safety_router, notifications_router
 from app.api.v1.reports import router as reports_router
+from app.api.v1.documents import router as documents_router
 
 api_v1_router = APIRouter(prefix="/api/v1")
 api_v1_router.include_router(auth_router)
@@ -17,3 +18,4 @@ api_v1_router.include_router(assistant_router)
 api_v1_router.include_router(safety_router)
 api_v1_router.include_router(notifications_router)
 api_v1_router.include_router(reports_router)
+api_v1_router.include_router(documents_router)

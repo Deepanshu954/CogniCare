@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
 import { Navbar } from "@/components/ui/Navbar";
 import { SosButton } from "@/components/elderly/SosButton";
+import { MedicalDocumentSection } from "@/components/documents/MedicalDocumentSection";
 import { PatientDetail } from "@/types";
 import { apiClient } from "@/lib/api";
 import { Phone, Shield, ArrowLeft, HeartPulse, User } from "lucide-react";
@@ -105,6 +106,13 @@ export default function SafetyPage() {
             )}
           </div>
         </section>
+
+        {/* Doctor Prescriptions & Medical Condition Details */}
+        {patientId && (
+          <section className="pt-2">
+            <MedicalDocumentSection patientId={patientId} />
+          </section>
+        )}
       </main>
     </div>
   );

@@ -15,6 +15,7 @@ from app.models.assistant import Conversation, Message, MemoryItem
 from app.models.safety import Alert, AlertEvent, Notification
 from app.models.report import Report
 from app.models.audit import AuditLog
+from app.models.document import MedicalDocument
 
 __all__ = [
     "Base",
@@ -45,4 +46,5 @@ __all__ = [
     "Notification",
     "Report",
     "AuditLog",
+    "MedicalDocument",
 ]

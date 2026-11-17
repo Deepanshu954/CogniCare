@@ -30,8 +30,8 @@
    - `figure3_reminder_state_machine.png`: Reminder Lifecycle & Escalation State Machine.
    - `figure4_test_verification_matrix.png`: Automated Test Verification & Statement Coverage Breakdown.
 4. **Working Software MVP**:
-   - Backend: FastAPI (Python 3.13) under `backend/` with 10 API routers and 15 automated integration tests (87% statement coverage).
-   - Frontend: Next.js 14 App Router under `frontend/` with 12 routes, accessible senior UI, 4 cognitive games, and 23 unit tests (100% pass).
+   - Backend: FastAPI (Python 3.13) under `backend/` with 11 API routers and 16 automated integration tests (88% statement coverage).
+   - Frontend: Next.js 14 App Router under `frontend/` with 12 routes, accessible senior UI, drag-and-drop medical documents & prescription repository, 4 cognitive games, and 26 unit tests (100% pass).
    - Containerization: `docker-compose.yml` supporting multi-stage non-root container deployment.
 
 ---
@@ -62,3 +62,4 @@ cd backend
 cd ../frontend
 npm test
 ```
+

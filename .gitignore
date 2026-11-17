@@ -76,3 +76,11 @@ Thumbs.db
 
 # Docker
 *.docker.log
+
+# Uploaded User Documents & Binaries
+uploads/*
+!uploads/.gitkeep
+!uploads/documents/
+uploads/documents/*
+!uploads/documents/.gitkeep
+

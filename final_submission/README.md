@@ -34,6 +34,7 @@
    - `figure3_reminder_state_machine.png`: Reminder Lifecycle & Escalation State Machine.
    - `figure4_test_verification_matrix.png`: Automated Test Verification & Statement Coverage Breakdown.
 6. **Production-Ready Codebase & Containers**:
-   - `backend/`: FastAPI Python 3.13 application with 15 automated integration tests (87% coverage).
-   - `frontend/`: Next.js 14 App Router application with 23 Vitest unit tests (100% pass rate).
+   - `backend/`: FastAPI Python 3.13 application with 16 automated integration tests (88% coverage).
+   - `frontend/`: Next.js 14 App Router application with drag-and-drop medical documents & prescription repository and 26 Vitest unit tests (100% pass rate).
    - `docker-compose.yml`: Multi-stage non-root container deployment configuration.
+

@@ -81,8 +81,8 @@ Crucially, the senior is *not* greeted with an alarming failure message—their 
 ### Q7: How did you verify the quality and reliability of your software?
 **Model Defense Answer:**
 Our testing and verification strategy spans multiple dimensions:
-1. **Backend Integration Suite (Pytest)**: 15 automated integration tests verifying authentication, tenant isolation, reminder lifecycles, cognitive scoring, safety alerts, and report generation. We achieved **87% overall statement coverage** (surpassing the 70% threshold).
-2. **Frontend Unit Suite (Vitest)**: 11 test files with 23 individual test cases verifying accessible components (`TodayCard`, `SosButton`, `TrendChart`, `AdherenceGauge`, `Navbar`, `uiScaleContext`). 100% pass rate.
+1. **Backend Integration Suite (Pytest)**: 16 automated integration tests verifying authentication, tenant isolation, reminder lifecycles, cognitive scoring, safety alerts, report generation, and medical document uploads. We achieved **88% overall statement coverage** (surpassing the 70% threshold).
+2. **Frontend Unit Suite (Vitest)**: 12 test files with 26 individual test cases verifying accessible components (`TodayCard`, `SosButton`, `TrendChart`, `AdherenceGauge`, `Navbar`, `uiScaleContext`, `MedicalDocuments`). 100% pass rate.
 3. **Flakiness Verification**: We ran both suites across **three consecutive iterations** with zero failures, proving complete test determinism.
 4. **Build & Lint Verification**: Next.js 14 production build compiled all 12 routes with zero TypeScript or ESLint errors.
 
@@ -90,10 +90,18 @@ Our testing and verification strategy spans multiple dimensions:
 **Model Defense Answer:**
 We enforce tenant isolation at the service and repository layers through FastAPI dependency injection:
 - Every protected endpoint requires the `get_current_user` dependency.
-- In `PatientService` and `CareService`, every query explicitly filters by the authenticated user ID or checks for an active row in `caregiver_links`.
-- If an authenticated user attempts to access or mutate a patient record that they do not own and have no consented caregiver link for, the service immediately raises an `HTTP 403 Forbidden` exception. This is verified in `test_patients.py:test_caregiver_patient_lifecycle_and_isolation`.
+- In `PatientService`, `CareService`, and `DocumentService`, every query explicitly filters by the authenticated user ID or checks for an active row in `caregiver_links`.
+- If an authenticated user attempts to access or mutate a patient record that they do not own and have no consented caregiver link for, the service immediately raises an `HTTP 403 Forbidden` exception. This is verified in `test_patients.py:test_caregiver_patient_lifecycle_and_isolation` and `test_documents.py:test_document_access_control_forbidden`.
 
-### Q9: How is the application deployed, and what are its resource constraints?
+### Q9: How does the Medical Document & Prescription Upload system work, and how are files stored?
+**Model Defense Answer:**
+The document management subsystem addresses a critical clinical need—preserving and sharing prescriptions, condition summaries, and diagnostic scans between doctors, caregivers, and seniors:
+- **Interactive UI**: Supports drag-and-drop file targets with visual drag feedback and file pickers restricted to `.pdf,image/*` under a 15 MB threshold.
+- **Categorization**: Classifies assets into `PRESCRIPTION`, `MEDICAL_CONDITION`, `LAB_REPORT`, `CLINICAL_NOTE`, `EMERGENCY_PLAN`, and `OTHER`.
+- **Hybrid Storage Architecture**: Ingested files are stored on disk under `uploads/documents/{uuid}_{filename}` with access controlled via FastAPI streaming endpoints (`GET /api/v1/patients/{id}/documents/{doc_id}/file`). Simultaneously, a base64 data URL is retained in SQLite/PostgreSQL to enable instantaneous zero-latency client previews in both desktop and mobile viewports.
+- **Audit Logging**: Every document creation or deletion generates an immutable row in the `audit_logs` table for clinical compliance.
+
+### Q10: How is the application deployed, and what are its resource constraints?
 **Model Defense Answer:**
 The application is deployed using a production-ready **Docker Compose** topology:
 - `cognicare-db`: `postgres:16-alpine`, persistent volume `pgdata`, internal healthcheck `pg_isready`.
@@ -116,3 +124,4 @@ The application is deployed using a production-ready **Docker Compose** topology
 ### Piyush (Database & Core Logic Engineer - E23CSEU0853)
 - **Primary Ownership**: PostgreSQL relational database schema (14 tables), SQLAlchemy 2.0 ORM mappings, reminder state machine with alert escalation, mathematical 4-factor scoring algorithm, and synthetic seeder engine.
 - **Key Technical Defense Defense**: Engineered the rolling baseline variance analyzer calculating $\mu \pm 1.5\sigma$ z-scores to trigger automated caregiver support signals.
+

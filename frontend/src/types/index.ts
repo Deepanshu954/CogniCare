@@ -255,3 +255,40 @@ export interface Conversation {
   messages: Message[];
   created_at: string;
 }
+
+export type DocumentCategory =
+  | "PRESCRIPTION"
+  | "MEDICAL_CONDITION"
+  | "LAB_REPORT"
+  | "CLINICAL_NOTE"
+  | "EMERGENCY_PLAN"
+  | "OTHER";
+
+export interface MedicalDocument {
+  id: string;
+  patient_id: string;
+  uploader_user_id?: string;
+  title: string;
+  document_type: DocumentCategory;
+  doctor_name?: string;
+  document_date?: string;
+  notes?: string;
+  file_name: string;
+  file_type: string;
+  file_size_bytes: number;
+  file_data_url?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DocumentCreatePayload {
+  title: string;
+  document_type: DocumentCategory;
+  doctor_name?: string;
+  document_date?: string;
+  notes?: string;
+  file_name: string;
+  file_type: string;
+  file_size_bytes: number;
+  file_data_url?: string;
+}

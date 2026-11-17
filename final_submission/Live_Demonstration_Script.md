@@ -111,6 +111,21 @@ docker compose ps
    - Click **"Generate Weekly Report"**.
    - Show the side-by-side display of code-calculated objective metrics (Adherence %, average latency, session counts) and the plain-language AI narrative summary.
 
+### 5.2 Medical Documents & Prescription Drag-and-Drop Ingestion
+1. Scroll down to the **"Medical Documents & Prescriptions"** section on the Caregiver Dashboard.
+2. Demonstrate the **Drag-and-Drop Upload Zone**:
+   - Drag a doctor's prescription PDF or lab test image directly over the drop area (observe the border transition to deep emerald with upload icons).
+   - Alternatively, click **"Upload Document"** to open the modal.
+3. Fill in the metadata:
+   - Category: *"Doctor Prescription"*
+   - Title: *"Donepezil Refill Authorization"*
+   - Doctor: *"Dr. Elena Vance, Neurologist"*
+4. Click **"Save Document"**:
+   - Demonstrates instant asynchronous upload, thumbnail generation, and secure local/cloud persistence.
+5. Filter documents by clicking category pills (*"Prescriptions"*, *"Medical Condition"*, *"Lab Reports"*).
+6. Click **"View"** on any document card to show the embedded inline PDF/image preview modal with download and print options.
+7. Show that seniors can also view their emergency plans and doctor instructions under the **Safety & Medical Documents** view (`/app/safety`).
+
 ---
 
 ## 🧪 Step 6: Live Test Execution & Code Quality Verification
@@ -128,6 +143,7 @@ npm test
 ```
 
 *Show Evaluators:*
-- **15/15 Backend Tests Passed (87% statement coverage)**.
-- **23/23 Frontend Vitest Tests Passed (100% pass rate)**.
+- **16/16 Backend Tests Passed (88% statement coverage)**.
+- **26/26 Frontend Vitest Tests Passed (100% pass rate)**.
 - Zero flaky tests. Zero compilation errors.
+

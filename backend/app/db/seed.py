@@ -20,6 +20,7 @@ from app.models.cognition import (
 from app.models.assistant import Conversation, Message, MemoryItem
 from app.models.safety import Alert, AlertEvent, Notification
 from app.models.report import Report
+from app.models.document import MedicalDocument
 from app.core.security import hash_password
 from app.services.care_service import CareService
 from app.services.report_service import ReportService
@@ -206,6 +207,61 @@ def seed_database():
         print("10. Generating Weekly Care Report...")
         report_service = ReportService(db)
         report_service.generate_weekly_report(margaret_patient.id, sarah_user)
+
+        # 11. Seed Medical Documents & Prescriptions
+        print("11. Seeding Medical Documents & Doctor Prescriptions...")
+        # Tiny 1x1 transparent png for sample image preview
+        sample_img_data = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+        # Tiny sample PDF data URL
+        sample_pdf_data = "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iajw8L1R5cGUvQ2F0YWxvZy9QYWdlcyAyIDAgUj4+ZW5kb2JqIDIgMCBvYmo8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PmVuZG9iag=="
+
+        db.add(
+            MedicalDocument(
+                patient_id=margaret_patient.id,
+                uploader_user_id=sarah_user.id,
+                title="Neurologist Prescription - Donepezil 10mg",
+                document_type="PRESCRIPTION",
+                doctor_name="Dr. Elena Vance, MD (Neurology)",
+                document_date="2026-10-15",
+                notes="Rx: Donepezil Hydrochloride 10mg. Dispense #30. Sig: Take 1 tablet by mouth daily in the evening with food. Refills: 3.",
+                file_name="Dr_Vance_Donepezil_Prescription.pdf",
+                file_type="application/pdf",
+                file_size_bytes=142850,
+                file_data_url=sample_pdf_data,
+            )
+        )
+
+        db.add(
+            MedicalDocument(
+                patient_id=margaret_patient.id,
+                uploader_user_id=sarah_user.id,
+                title="Mild Cognitive Impairment Diagnostic Summary",
+                document_type="MEDICAL_CONDITION",
+                doctor_name="Dr. Elena Vance, MD (Neurology)",
+                document_date="2026-10-10",
+                notes="Clinical Assessment: Mild Cognitive Impairment, amnestic type (ICD-10 G31.84). MMSE Score: 26/30. Recommends structured daily routine, hydration, and interactive cognitive exercises.",
+                file_name="MCI_Clinical_Evaluation_Report.pdf",
+                file_type="application/pdf",
+                file_size_bytes=254100,
+                file_data_url=sample_pdf_data,
+            )
+        )
+
+        db.add(
+            MedicalDocument(
+                patient_id=margaret_patient.id,
+                uploader_user_id=sarah_user.id,
+                title="Annual Metabolic & B12 Lab Panel Results",
+                document_type="LAB_REPORT",
+                doctor_name="Metro Health Diagnostic Labs",
+                document_date="2026-11-01",
+                notes="Serum B12: 450 pg/mL (Normal). TSH: 2.1 mIU/L (Euthyroid). Fasting Glucose: 92 mg/dL. Renal function within normal parameters.",
+                file_name="Lab_Panel_Blood_Report.png",
+                file_type="image/png",
+                file_size_bytes=89400,
+                file_data_url=sample_img_data,
+            )
+        )
 
         db.commit()
         print("\nDatabase successfully seeded with realistic demonstration data!")

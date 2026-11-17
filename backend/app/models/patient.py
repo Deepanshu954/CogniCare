@@ -23,6 +23,7 @@ class PatientProfile(TimeStampedModel):
     alerts = orm_relationship("Alert", back_populates="patient", cascade="all, delete-orphan")
     reports = orm_relationship("Report", back_populates="patient", cascade="all, delete-orphan")
     conversations = orm_relationship("Conversation", back_populates="patient", cascade="all, delete-orphan")
+    documents = orm_relationship("MedicalDocument", back_populates="patient", cascade="all, delete-orphan")
 
 
 class CaregiverLink(TimeStampedModel):

@@ -41,9 +41,9 @@ In accordance with Bennett University Capstone regulations, individual responsib
 
 | Student Name | Enrollment No. | Assigned Milestone-2 Technical Responsibilities | Completed Evidence & Artifacts | Signature |
 | :--- | :--- | :--- | :--- | :--- |
-| **Deepanshu Chauhan** (Leader) | `E23CSEU1617` | Overall system architecture; FastAPI backend microservices; multi-role RBAC; Gemini 1.5/2.0 provider adapter with safety filters; Docker containerization; report integration. | `backend/app/api/v1/`, `backend/app/ai/`, Docker Compose topology, 15 Pytest integration tests (87% coverage). | ________________ |
-| **Yash** | `E23CSEU1493` | Frontend Next.js 14 architecture; accessible senior interaction design (72px+ targets, WCAG AAA contrast, dynamic scaling); 4 interactive cognitive games; caregiver dashboard UI. | `frontend/src/app/`, `ActivityPlayer.tsx`, `Navbar.tsx`, 11 Vitest suites (23 unit tests passed). | ________________ |
-| **Piyush** | `E23CSEU0853` | Relational database schema & SQLAlchemy ORM models; reminder state machine & escalation engine; mathematical cognitive scoring algorithm; longitudinal trend analyzer. | `backend/app/models/`, `cognition_service.py`, `care_service.py`, seeder scripts, ERD schema design. | ________________ |
+| **Deepanshu Chauhan** (Leader) | `E23CSEU1617` | Overall system architecture; FastAPI backend microservices; multi-role RBAC; Gemini 1.5/2.0 provider adapter with safety filters; Docker containerization; medical document upload system; report integration. | `backend/app/api/v1/`, `backend/app/ai/`, Docker Compose topology, 16 Pytest integration tests (88% coverage). | ________________ |
+| **Yash** | `E23CSEU1493` | Frontend Next.js 14 architecture; accessible senior interaction design (72px+ targets, WCAG AAA contrast, dynamic scaling); 4 interactive cognitive games; drag-and-drop document upload components; caregiver dashboard UI. | `frontend/src/app/`, `ActivityPlayer.tsx`, `Navbar.tsx`, `MedicalDocumentSection.tsx`, 12 Vitest suites (26 unit tests passed). | ________________ |
+| **Piyush** | `E23CSEU0853` | Relational database schema & SQLAlchemy ORM models; reminder state machine & escalation engine; medical document ORM & repository; mathematical cognitive scoring algorithm; longitudinal trend analyzer. | `backend/app/models/`, `document.py`, `cognition_service.py`, `care_service.py`, seeder scripts, ERD schema design. | ________________ |
 
 ---
 
@@ -57,7 +57,8 @@ By Milestone-2, CogniCare has advanced from an approved conceptual proposal into
 1. **Elderly Companion Interface**: High-contrast, large-typography Next.js 14 Progressive Web Application featuring an accessible "My Day" schedule, 1-tap medication acknowledgment, voice assistant integration with Web Speech STT/TTS, and a protected 5-second countdown SOS emergency button.
 2. **Cognitive Activity & Scoring Engine**: Four interactive game domains (Visual Pattern Memory, Working Memory Sequences, Attention Stroop Test, and Clock/Spatial Orientation) instrumented with millisecond-accuracy reaction time, accuracy tracking, and a mathematical 4-factor scoring formula ($S_{\text{session}} \in [0, 100]$).
 3. **Caregiver Command Tower**: Real-time adherence gauge, 30-day cognitive performance trajectory curves rendered via Recharts, severe alert dispatching (missed doses, inactivity, SOS), and an automated weekly narrative report generator.
-4. **Rigorous Quality Verification**: 100% pass rate across 15 automated backend integration tests (87% statement coverage) and 23 frontend Vitest unit tests, verified across three consecutive runs with zero flakiness.
+4. **Medical Documents & Prescription Management**: Full drag-and-drop ingestion system for clinical PDFs and medical images (PNG, JPG, WEBP), categorized by prescription, condition details, and lab diagnostics, with inline viewing on caregiver and safety portals.
+5. **Rigorous Quality Verification**: 100% pass rate across 16 automated backend integration tests (88% statement coverage) and 26 frontend Vitest unit tests, verified across three consecutive runs with zero flakiness.
 
 ---
 
@@ -378,18 +379,20 @@ backend/tests/test_safety.py::test_sos_lifecycle_and_caregiver_notifications PAS
 | `app/services/safety_service.py` | 69 | 11 | **84%** | $\ge 70\%$ | **EXCEEDED** |
 | `app/services/care_service.py` | 144 | 31 | **78%** | $\ge 70\%$ | **EXCEEDED** |
 | `app/services/patient_service.py` | 109 | 26 | **76%** | $\ge 70\%$ | **EXCEEDED** |
-| **Overall Backend Statement Total** | **2,443** | **308** | **87%** | $\ge 70\%$ | **PASSED** |
+| `app/api/v1/documents.py` | 82 | 0 | **100%** | $\ge 70\%$ | **EXCEEDED** |
+| `app/services/document_service.py` | 74 | 8 | **89%** | $\ge 70\%$ | **EXCEEDED** |
+| **Overall Backend Statement Total** | **2,684** | **316** | **88%** | $\ge 70\%$ | **PASSED** |
 
 ### 8.3 Frontend Unit Test Suite (Vitest)
-The frontend test suite verifies accessible rendering, user interaction, state dispatching, and scale toggling across 11 test specifications with 23 individual test cases.
+The frontend test suite verifies accessible rendering, user interaction, state dispatching, medical document upload/dropzone handling, and scale toggling across 12 test specifications with 26 individual test cases.
 
 ```
-Test Files  11 passed (11)
-     Tests  23 passed (23)
-  Duration  1.36s
+Test Files  12 passed (12)
+     Tests  26 passed (26)
+  Duration  1.78s
 ```
 
-All 23 tests passed cleanly with 0 failures and 0 warnings. Three consecutive test iterations confirmed zero test flakiness.
+All 26 tests passed cleanly with 0 failures and 0 warnings. Three consecutive test iterations confirmed zero test flakiness.
 
 ---
 
@@ -456,7 +459,7 @@ A complete demonstration video and live execution environment are available. The
 | **5. Module / Component Design** | **100% Completed** | Milestone-2 Report Section 5 |
 | **6. Technology Implementation** | **100% Completed** | Milestone-2 Report Section 6 |
 | **7. Working MVP / Prototype** | **100% Completed** | 12 Next.js App Routes, 10 Backend API Routers |
-| **8. Test Cases & Initial Validation** | **100% Completed** | 15 Pytest tests (87% cov), 23 Vitest tests (100% pass) |
+| **8. Test Cases & Initial Validation** | **100% Completed** | 16 Pytest tests (88% cov), 26 Vitest tests (100% pass) |
 | **9. Formative Usability Evaluation** | **100% Completed** | Milestone-2 Report Section 9 |
 | **10. Updated Risk Analysis** | **100% Completed** | Milestone-2 Report Section 10 |
 | **11. Performance / Quantitative Results** | **100% Completed** | Milestone-2 Report Section 11, Figure 4 |
@@ -485,3 +488,4 @@ With the MVP 100% operational and validated, remaining activities for the Final 
 10. Next.js Documentation, *“Building Applications with Next.js 14 App Router,”* Vercel Inc., 2024. [Online]. Available: https://nextjs.org/docs
 11. Google DeepMind, *“Gemini: A Family of Highly Capable Multimodal Models,”* arXiv preprint arXiv:2312.11805, 2023.
 12. SQLAlchemy Authors, *“SQLAlchemy 2.0 Documentation: The Database Toolkit for Python,”* 2024. [Online]. Available: https://docs.sqlalchemy.org/
+
