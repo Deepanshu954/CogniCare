@@ -197,33 +197,45 @@ Audited and hardened against OWASP Top 10 vulnerabilities:
 
 ---
 
+## 🎓 Bennett University Capstone Deliverables (CSET400C)
+
+This project has been submitted and verified for **CSET400C – Capstone Project** (Semester VII B.Tech. CSE, Academic Session 2026–27) at **Bennett University**:
+- **Team**: Deepanshu Chauhan (`E23CSEU1617` - Leader), Yash (`E23CSEU1493`), Piyush (`E23CSEU0853`)
+- **Faculty Mentor & Project Guide**: Amit Chauhan | **Course Coordinator**: Dr. Jabir Ali
+
+### Deliverables Packages:
+1. **[Milestone 1 Deliverables (30 Marks)](milestone%201/README.md)**:
+   - Proposal, Requirements & Feasibility Report (`Milestone_1_Report.pdf`, `Milestone_1_Report.docx`, `Milestone_1_Report.md`)
+   - Presentation (`CogniCare_Milestone_1_Presentation.pptx`)
+2. **[Milestone 2 Deliverables (30 Marks)](milestone%202/README.md)**:
+   - Design, MVP/Prototype & Initial Validation Report (`Milestone_2_Report.docx`, `Milestone_2_Report.md`)
+   - Presentation Slide Deck (`CogniCare_Milestone_2_Presentation.pptx`)
+   - High-Resolution Architecture, DFD, State Machine & Scoring Diagrams (`figures/`)
+3. **[Final Capstone Submission Package (40 Marks)](final_submission/README.md)**:
+   - Final Capstone Mini-Report (`Final_Capstone_Report.docx`, `Final_Capstone_Report.md`) adhering to Chapter 12 formatting specifications
+   - Final Panel Presentation Deck (`CogniCare_Final_Presentation.pptx`)
+   - Comprehensive Technical Viva-Voce Defense Guide (`Viva_Voce_Defence_Guide.md`)
+   - Step-by-Step Live Demonstration Script (`Live_Demonstration_Script.md`)
+
+---
+
 ## 📁 Repository Structure
 
 ```
 CogniCare/
-├── backend/                  # FastAPI Application
-│   ├── app/
-│   │   ├── ai/               # AI Provider abstraction & MockAIProvider
-│   │   ├── api/v1/           # REST Route Controllers
-│   │   ├── core/             # Security, config, rate-limiter, exceptions
-│   │   ├── db/               # Database seeder (Margaret & Sarah data)
-│   │   ├── models/           # SQLAlchemy 2.0 ORM Models
-│   │   ├── repositories/     # Database queries & persistence
-│   │   ├── schemas/          # Pydantic v2 Request/Response Schemas
-│   │   └── services/         # Business domain logic & scoring engines
-│   ├── tests/                # Pytest automated test suites
+├── backend/                  # FastAPI Application (Python 3.13)
+│   ├── app/                  # AI Provider, routes, core, models, services
+│   ├── tests/                # 15 automated Pytest integration tests (87% coverage)
 │   ├── Dockerfile            # Multi-stage Python 3.13 image
 │   └── requirements.txt      # Locked dependencies
-├── frontend/                 # Next.js 14 App Router
-│   ├── src/
-│   │   ├── app/              # Routes: /app/*, /caregiver/*, /login, /register
-│   │   ├── components/       # Senior & Caregiver accessible components
-│   │   ├── lib/              # API client, AuthContext, QueryClient
-│   │   ├── types/            # TypeScript interfaces
-│   │   └── __tests__/        # Vitest & React Testing Library suites
-│   ├── public/               # PWA manifest.json & sw.js
+├── frontend/                 # Next.js 14 App Router (TypeScript, Tailwind)
+│   ├── src/                  # Routes, components, lib, types
+│   ├── src/__tests__/        # 11 Vitest test suites (23 passed tests)
 │   ├── Dockerfile            # Multi-stage Next.js standalone runner
 │   └── package.json
+├── milestone 1/              # Milestone 1 Report (.docx, .pdf, .md) & Presentation (.pptx)
+├── milestone 2/              # Milestone 2 Report (.docx, .md), Presentation (.pptx), Figures
+├── final_submission/         # Final Report (.docx, .md), PPTX, Viva Defense Guide, Demo Script
 ├── .ai/                      # Agent Lifecycle Records (Design, Test, Secure, Deploy)
 ├── .agent_memory/            # Persistent Architecture & Codebase Memory Graph
 ├── .github/workflows/ci.yml  # Automated GitHub Actions CI pipeline

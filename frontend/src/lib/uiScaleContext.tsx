@@ -16,19 +16,35 @@ export const UiScaleProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [scale, setScaleState] = useState<UiScale>("large");
 
   useEffect(() => {
-    const saved = localStorage.getItem("cognicare_ui_scale") as UiScale;
-    if (saved && ["normal", "large", "extra-large"].includes(saved)) {
-      setScaleState(saved);
-      document.documentElement.setAttribute("data-scale", saved);
-    } else {
+    if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+      try {
+        const saved = localStorage.getItem("cognicare_ui_scale") as UiScale;
+        if (saved && ["normal", "large", "extra-large"].includes(saved)) {
+          setScaleState(saved);
+          document.documentElement.setAttribute("data-scale", saved);
+          return;
+        }
+      } catch (e) {
+        // Fallback for sandboxed storage
+      }
+    }
+    if (typeof document !== "undefined") {
       document.documentElement.setAttribute("data-scale", "large");
     }
   }, []);
 
   const setScale = (newScale: UiScale) => {
     setScaleState(newScale);
-    localStorage.setItem("cognicare_ui_scale", newScale);
-    document.documentElement.setAttribute("data-scale", newScale);
+    if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+      try {
+        localStorage.setItem("cognicare_ui_scale", newScale);
+      } catch (e) {
+        // Fallback for sandboxed storage
+      }
+    }
+    if (typeof document !== "undefined") {
+      document.documentElement.setAttribute("data-scale", newScale);
+    }
   };
 
   const scaleLabels: Record<UiScale, string> = {
