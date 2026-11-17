@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
@@ -5,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
 import { Navbar } from "@/components/ui/Navbar";
 import { VoiceButton } from "@/components/elderly/VoiceButton";
-import { Message, Conversation } from "@/types";
+import { Message, Conversation, ApiKeyStatus } from "@/types";
 import { apiClient } from "@/lib/api";
 import {
   Send,
@@ -23,6 +24,13 @@ import {
   Mic,
   X,
   Radio,
+  Paperclip,
+  FileText,
+  Key,
+  CheckCircle2,
+  AlertCircle,
+  UploadCloud,
+  ImageIcon,
 } from "lucide-react";
 
 export default function AssistantPage() {
@@ -46,6 +54,23 @@ export default function AssistantPage() {
   const [talkAloud, setTalkAloud] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+
+  // File Attachment & Drag and Drop State
+  const [pendingAttachment, setPendingAttachment] = useState<{
+    name: string;
+    type: string;
+    size: number;
+    data_url: string;
+  } | null>(null);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Gemini API Key State
+  const [apiKeyStatus, setApiKeyStatus] = useState<ApiKeyStatus | null>(null);
+  const [apiKeyModalOpen, setApiKeyModalOpen] = useState(false);
+  const [apiKeyInput, setApiKeyInput] = useState("");
+  const [isSavingKey, setIsSavingKey] = useState(false);
+  const [keyMessage, setKeyMessage] = useState<{ text: string; isError: boolean } | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const patientId = user?.patient_profile?.id;
@@ -85,6 +110,7 @@ export default function AssistantPage() {
     }
   };
 
+  // Load Conversation & API Key Status
   useEffect(() => {
     const initConversation = async () => {
       if (!patientId) return;
@@ -95,6 +121,12 @@ export default function AssistantPage() {
       } catch (e) {
         console.error("Failed to load conversation:", e);
       }
+      try {
+        const keyRes = await apiClient.get<ApiKeyStatus>(`/patients/${patientId}/assistant/api-key`);
+        setApiKeyStatus(keyRes.data);
+      } catch (e) {
+        console.error("Failed to fetch API key status:", e);
+      }
     };
     initConversation();
   }, [patientId]);
@@ -103,9 +135,51 @@ export default function AssistantPage() {
     scrollToBottom();
   }, [messages]);
 
+  const handleFileSelected = (file: File) => {
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) {
+      alert("File size exceeds 15MB limit.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      setPendingAttachment({
+        name: file.name,
+        type: file.type || (file.name.endsWith(".pdf") ? "application/pdf" : "image/png"),
+        size: file.size,
+        data_url: result,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveApiKey = async () => {
+    if (!apiKeyInput.trim() || !patientId) return;
+    setIsSavingKey(true);
+    setKeyMessage(null);
+    try {
+      const res = await apiClient.post<ApiKeyStatus>(
+        `/patients/${patientId}/assistant/api-key`,
+        { api_key: apiKeyInput.trim() }
+      );
+      setApiKeyStatus(res.data);
+      if (res.data.is_valid) {
+        setKeyMessage({ text: "API Key verified successfully! Gemini 2.0 Live is connected.", isError: false });
+        setTimeout(() => setApiKeyModalOpen(false), 1600);
+      } else {
+        setKeyMessage({ text: res.data.status_detail || "Google rejected this key. Check that it starts with AIzaSy...", isError: true });
+      }
+    } catch (e: any) {
+      setKeyMessage({ text: e.response?.data?.message || "Failed to configure key.", isError: true });
+    } finally {
+      setIsSavingKey(false);
+    }
+  };
+
   const handleSendMessage = async (textToSend?: string) => {
-    const text = textToSend || inputText;
-    if (!text.trim() || !conversation || !patientId || isSending) return;
+    const text = textToSend !== undefined ? textToSend : inputText;
+    if ((!text.trim() && !pendingAttachment) || !conversation || !patientId || isSending) return;
 
     // Stop any ongoing speech before processing new request
     stopSpeaking();
@@ -114,20 +188,35 @@ export default function AssistantPage() {
     setInputText("");
     if (isLiveTalkOpen) setLiveTalkStatus("thinking");
 
+    const currentAttachment = pendingAttachment;
+    setPendingAttachment(null);
+
     // Optimistic user message bubble
     const tempUserMsg: Message = {
       id: `temp_${Date.now()}`,
       conversation_id: conversation.id,
       role: "USER",
-      content: text,
+      content: text.trim() || (currentAttachment ? `Attached: ${currentAttachment.name}` : ""),
+      attachment_name: currentAttachment?.name,
+      attachment_type: currentAttachment?.type,
+      attachment_data_url: currentAttachment?.data_url,
       created_at: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, tempUserMsg]);
 
     try {
+      const payload: any = {
+        content: text.trim() || (currentAttachment ? `Please explain this ${currentAttachment.name}` : ""),
+        mode: activeMode,
+      };
+      if (currentAttachment) {
+        payload.attachment_name = currentAttachment.name;
+        payload.attachment_type = currentAttachment.type;
+        payload.attachment_data_url = currentAttachment.data_url;
+      }
       const res = await apiClient.post<Message>(
         `/patients/${patientId}/conversations/${conversation.id}/messages`,
-        { content: text, mode: activeMode }
+        payload
       );
       setMessages((prev) => [...prev, res.data]);
 
@@ -208,12 +297,19 @@ export default function AssistantPage() {
     recognition.start();
   };
 
-  const quickPrompts = [
-    "What do I have today?",
-    "Did I take my morning pills?",
-    "Tell me a calm story",
-    "Where is Sarah?",
-  ];
+  const quickPrompts = pendingAttachment
+    ? [
+        "Explain this prescription",
+        "What are the dosage instructions?",
+        "Save to my medical records",
+        "Is this document normal?",
+      ]
+    : [
+        "What do I have today?",
+        "Did I take my morning pills?",
+        "What is the speed of light?",
+        "Tell me a calm story",
+      ];
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col">
@@ -276,6 +372,24 @@ export default function AssistantPage() {
                   <VolumeX className="w-4 h-4 text-slate-500" />
                 )}
                 <span>{talkAloud ? "Talk Aloud: ON" : "Talk Aloud: OFF"}</span>
+              </button>
+
+              {/* Gemini API Key Configuration Pill */}
+              <button
+                type="button"
+                onClick={() => {
+                  setKeyMessage(null);
+                  setApiKeyModalOpen(true);
+                }}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl text-xs sm:text-sm font-bold border transition cursor-pointer ${
+                  apiKeyStatus?.is_valid
+                    ? "bg-emerald-950/80 border-emerald-500 text-emerald-300"
+                    : "bg-amber-950/80 border-amber-500 text-amber-300 hover:bg-amber-900"
+                }`}
+                title={apiKeyStatus?.status_detail || "Configure Google Gemini API Key"}
+              >
+                <Key className="w-4 h-4" />
+                <span>{apiKeyStatus?.is_valid ? "API Connected" : "Set Gemini Key"}</span>
               </button>
 
               {/* Global Stop Speaking Button (Shown when TTS is active) */}
@@ -355,13 +469,41 @@ export default function AssistantPage() {
           </div>
         </div>
 
-        {/* Message Stream */}
-        <div className="flex-1 overflow-y-auto space-y-4 mb-6 min-h-[300px]">
+        {/* Message Stream with Drag & Drop Zone */}
+        <div
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDraggingOver(true);
+          }}
+          onDragLeave={() => setIsDraggingOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setIsDraggingOver(false);
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+              handleFileSelected(e.dataTransfer.files[0]);
+            }
+          }}
+          className={`flex-1 overflow-y-auto space-y-4 mb-4 min-h-[320px] p-4 rounded-3xl transition relative ${
+            isDraggingOver
+              ? "bg-emerald-950/40 border-2 border-dashed border-emerald-400"
+              : "bg-slate-950/40 border border-slate-900"
+          }`}
+        >
+          {isDraggingOver && (
+            <div className="absolute inset-0 z-30 bg-slate-950/90 backdrop-blur-sm flex flex-col items-center justify-center text-center p-6 rounded-3xl animate-fade-in pointer-events-none">
+              <UploadCloud className="w-16 h-16 text-emerald-400 mb-3 animate-bounce" />
+              <h3 className="text-xl font-bold text-white mb-1">Drop Medical File Here</h3>
+              <p className="text-slate-300 text-sm max-w-sm">
+                Drop your prescription PDF or medical image to inspect with CogniCare AI
+              </p>
+            </div>
+          )}
+
           {messages.length === 0 ? (
             <div className="text-center py-12 text-slate-400">
               <Bot className="w-12 h-12 text-sky-400 mx-auto mb-3" />
               <p className="text-xl font-bold text-white">Hello! How can I help you today?</p>
-              <p className="text-base text-slate-400 mt-1">Tap the microphone or choose a quick question above.</p>
+              <p className="text-base text-slate-400 mt-1">Tap the microphone, type a question, or attach a prescription.</p>
             </div>
           ) : (
             messages.map((m) => {
@@ -371,6 +513,9 @@ export default function AssistantPage() {
                 m.tool_calls?.active_model ||
                 (activeMode === "extended" ? "Gemini 3.8 Live Extended Thinking" : "Gemini 3.8 Live");
               const thinkingTrace = m.thinking_trace || m.tool_calls?.thinking_trace;
+              const attachmentDataUrl = m.attachment_data_url || m.tool_calls?.attachment?.data_url;
+              const attachmentName = m.attachment_name || m.tool_calls?.attachment?.name;
+              const attachmentType = m.attachment_type || m.tool_calls?.attachment?.type;
 
               return (
                 <div
@@ -411,6 +556,33 @@ export default function AssistantPage() {
                       </div>
                     )}
 
+                    {/* Attached File Card inside User Message */}
+                    {isUser && (attachmentDataUrl || attachmentName) && (
+                      <div className="mb-3">
+                        {attachmentDataUrl && (attachmentType?.startsWith("image/") || attachmentDataUrl.startsWith("data:image")) ? (
+                          <div className="overflow-hidden rounded-xl border border-white/20 shadow-md max-w-xs">
+                            <img
+                              src={attachmentDataUrl}
+                              alt={attachmentName || "Uploaded medical image"}
+                              className="w-full max-h-48 object-cover"
+                            />
+                            <div className="bg-black/60 p-1.5 px-2.5 text-[11px] text-slate-200 flex items-center justify-between">
+                              <span className="truncate">{attachmentName || "Prescription Scan"}</span>
+                              <span className="text-[10px] text-emerald-300 uppercase font-bold">Image</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-indigo-700/90 border border-indigo-400/40 text-xs text-white max-w-xs">
+                            <FileText className="w-6 h-6 text-indigo-200 flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <span className="font-bold truncate block">{attachmentName || "Medical_Document.pdf"}</span>
+                              <span className="text-[10px] text-indigo-200">PDF Document</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     <p className="whitespace-pre-line">{m.content}</p>
 
                     {!isUser && (
@@ -446,15 +618,78 @@ export default function AssistantPage() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Text Input Fallback Bar with Instant Stop Speaking Control */}
+        {/* Attachment Pending Preview Bar */}
+        {pendingAttachment && (
+          <div className="mb-2 p-2.5 px-3.5 rounded-2xl bg-slate-900 border border-slate-700 flex items-center justify-between gap-3 animate-fade-in shadow-lg">
+            <div className="flex items-center gap-3 min-w-0">
+              {pendingAttachment.type.startsWith("image/") ? (
+                <img
+                  src={pendingAttachment.data_url}
+                  alt="Attachment preview"
+                  className="w-10 h-10 rounded-xl object-cover border border-slate-600 shadow-sm"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-red-950/80 border border-red-700 flex items-center justify-center text-red-300">
+                  <FileText className="w-6 h-6" />
+                </div>
+              )}
+              <div className="min-w-0">
+                <span className="font-bold text-white text-sm block truncate">
+                  {pendingAttachment.name}
+                </span>
+                <span className="text-xs text-emerald-400 font-semibold">
+                  Ready to send • {(pendingAttachment.size / 1024).toFixed(1)} KB
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setPendingAttachment(null)}
+              className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition"
+              title="Remove attached file"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Text Input Bar with Paperclip File Ingestion */}
         <div className="bg-slate-900 border border-slate-800 p-2 sm:p-3 rounded-2xl flex items-center gap-2">
+          {/* Hidden File Picker Input */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={(e) => {
+              if (e.target.files && e.target.files[0]) {
+                handleFileSelected(e.target.files[0]);
+              }
+            }}
+            accept=".pdf,image/png,image/jpeg,image/jpg,image/webp"
+            className="hidden"
+          />
+
+          {/* Paperclip Button */}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="p-3 text-slate-400 hover:text-sky-300 hover:bg-slate-800 rounded-xl transition cursor-pointer flex-shrink-0"
+            title="Attach doctor prescription or medical image"
+            aria-label="Upload file"
+          >
+            <Paperclip className="w-5 h-5" />
+          </button>
+
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-            placeholder="Type your question or request..."
-            className="flex-1 bg-transparent px-4 py-2.5 text-white text-base sm:text-lg placeholder-slate-500 focus:outline-none"
+            placeholder={
+              pendingAttachment
+                ? `Ask about ${pendingAttachment.name}... (or tap send)`
+                : "Type your question or request..."
+            }
+            className="flex-1 bg-transparent px-2 sm:px-3 py-2.5 text-white text-base sm:text-lg placeholder-slate-500 focus:outline-none"
           />
 
           {isSpeaking && (
@@ -472,7 +707,7 @@ export default function AssistantPage() {
 
           <button
             onClick={() => handleSendMessage()}
-            disabled={!inputText.trim() || isSending}
+            disabled={(!inputText.trim() && !pendingAttachment) || isSending}
             className="p-3.5 bg-sky-600 hover:bg-sky-500 disabled:opacity-50 text-white rounded-xl shadow cursor-pointer transition"
           >
             <Send className="w-5 h-5" />
@@ -595,6 +830,104 @@ export default function AssistantPage() {
             >
               Close & Return to Chat
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Gemini API Key Configuration Modal */}
+      {apiKeyModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl animate-fade-in">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
+              <div className="flex items-center gap-2.5 text-white font-black text-lg">
+                <Key className="w-5 h-5 text-sky-400" />
+                <span>Google Gemini API Configuration</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setApiKeyModalOpen(false)}
+                className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-slate-300 text-sm mb-4 leading-relaxed">
+              Connect CogniCare to live <strong>Google Gemini 2.0 Flash</strong> for real-time generative responses.
+            </p>
+
+            <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 mb-4 text-xs space-y-2 text-slate-300">
+              <div className="flex items-center justify-between font-bold">
+                <span className="text-slate-400">Current Status:</span>
+                <span className={apiKeyStatus?.is_valid ? "text-emerald-400" : "text-amber-400"}>
+                  {apiKeyStatus?.is_valid ? "● Live AI Connected" : "○ Local Offline Engine"}
+                </span>
+              </div>
+              {apiKeyStatus?.masked_key && (
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Key:</span>
+                  <span className="font-mono text-slate-300">{apiKeyStatus.masked_key}</span>
+                </div>
+              )}
+              <div className="text-[11px] text-slate-400 pt-1 border-t border-slate-800">
+                {apiKeyStatus?.status_detail}
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                Enter Gemini API Key (starts with AIzaSy...)
+              </label>
+              <input
+                type="password"
+                value={apiKeyInput}
+                onChange={(e) => setApiKeyInput(e.target.value)}
+                placeholder="AIzaSy..."
+                className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-white font-mono text-sm focus:outline-none"
+              />
+              <p className="text-[11px] text-slate-500 mt-2">
+                Get a free API key at{" "}
+                <a
+                  href="https://aistudio.google.com/app/apikey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sky-400 underline hover:text-sky-300"
+                >
+                  aistudio.google.com/app/apikey
+                </a>
+              </p>
+            </div>
+
+            {keyMessage && (
+              <div
+                className={`p-3 rounded-xl mb-4 text-xs font-medium flex items-center gap-2 ${
+                  keyMessage.isError
+                    ? "bg-rose-950/70 border border-rose-800 text-rose-300"
+                    : "bg-emerald-950/70 border border-emerald-800 text-emerald-300"
+                }`}
+              >
+                {keyMessage.isError ? <AlertCircle className="w-4 h-4 flex-shrink-0" /> : <CheckCircle2 className="w-4 h-4 flex-shrink-0" />}
+                <span>{keyMessage.text}</span>
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setApiKeyModalOpen(false)}
+                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-bold transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveApiKey}
+                disabled={!apiKeyInput.trim() || isSavingKey}
+                className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 disabled:opacity-50 text-white text-sm font-bold transition flex items-center gap-2 shadow-lg shadow-sky-900/40"
+              >
+                {isSavingKey ? "Verifying..." : "Verify & Save Key"}
+              </button>
+            </div>
           </div>
         </div>
       )}

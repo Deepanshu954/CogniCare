@@ -244,7 +244,19 @@ export interface Message {
   active_model?: string;
   thinking_trace?: string;
   tool_calls?: any;
+  attachment_url?: string;
+  attachment_name?: string;
+  attachment_type?: string;
+  attachment_data_url?: string;
   created_at: string;
+}
+
+export interface ApiKeyStatus {
+  is_configured: boolean;
+  is_valid: boolean;
+  masked_key?: string;
+  active_model: string;
+  status_detail: string;
 }
 
 export interface Conversation {

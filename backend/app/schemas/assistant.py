@@ -6,6 +6,10 @@ from pydantic import BaseModel, ConfigDict
 class MessageCreate(BaseModel):
     content: str
     mode: Optional[str] = "normal"  # "normal" (Gemini 3.8 Live) or "extended" (Gemini 3.8 Live Extended Thinking)
+    attachment_url: Optional[str] = None
+    attachment_name: Optional[str] = None
+    attachment_type: Optional[str] = None
+    attachment_data_url: Optional[str] = None
 
 
 class MessageResponse(BaseModel):
@@ -19,7 +23,23 @@ class MessageResponse(BaseModel):
     tool_calls: Optional[Dict[str, Any]] = None
     active_model: Optional[str] = None
     thinking_trace: Optional[str] = None
+    attachment_url: Optional[str] = None
+    attachment_name: Optional[str] = None
+    attachment_type: Optional[str] = None
+    attachment_data_url: Optional[str] = None
     created_at: datetime
+
+
+class ApiKeyStatusResponse(BaseModel):
+    is_configured: bool
+    is_valid: bool
+    masked_key: Optional[str] = None
+    active_model: str
+    status_detail: str
+
+
+class ApiKeyConfigRequest(BaseModel):
+    api_key: str
 
 
 class ConversationResponse(BaseModel):

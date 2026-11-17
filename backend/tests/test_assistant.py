@@ -83,3 +83,37 @@ def test_ai_assistant_grounding_and_safety_guardrails(client):
     list_mem_res = client.get(f"/api/v1/patients/{patient_id}/memory", headers=auth_header)
     assert list_mem_res.status_code == 200
     assert len(list_mem_res.json()) == 1
+
+    # 8. Science & General Knowledge (e.g. speed of light)
+    sol_res = client.post(
+        f"/api/v1/patients/{patient_id}/conversations/{conv_id}/messages",
+        headers=auth_header,
+        json={"content": "What is the speed of light?"},
+    )
+    assert sol_res.status_code == 200
+    sol_reply = sol_res.json()["content"]
+    assert "299,792" in sol_reply or "kilometers per second" in sol_reply or "186,282" in sol_reply
+
+    # 9. Attachment Handling (Uploaded Prescription / Medical Document)
+    attach_res = client.post(
+        f"/api/v1/patients/{patient_id}/conversations/{conv_id}/messages",
+        headers=auth_header,
+        json={
+            "content": "Can you explain this prescription?",
+            "attachment_name": "Donepezil_Refill_Prescription.pdf",
+            "attachment_type": "application/pdf",
+            "attachment_data_url": "data:application/pdf;base64,JVBERi0xLjQKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xpYnJhcnkgKENvZ25pQ2FyZSkKPj4KZW5kb2JqCnRyYWlsZXIKPDwKL1Jvb3QgNCAwIFIKPj4KJSVFT0YK",
+        },
+    )
+    assert attach_res.status_code == 200
+    attach_reply = attach_res.json()["content"]
+    assert "prescription" in attach_reply.lower() or "donepezil" in attach_reply.lower() or "medical" in attach_reply.lower()
+
+    # 10. API Key Status & Configuration Endpoint
+    key_status_res = client.get(
+        f"/api/v1/patients/{patient_id}/assistant/api-key",
+        headers=auth_header,
+    )
+    assert key_status_res.status_code == 200
+    assert "is_configured" in key_status_res.json()
+    assert "active_model" in key_status_res.json()
