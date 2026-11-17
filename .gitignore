@@ -84,3 +84,5 @@ uploads/*
 uploads/documents/*
 !uploads/documents/.gitkeep
 
+.vercel
+.env*
