@@ -36,8 +36,8 @@ ENV PATH="/opt/venv/bin:$PATH"
 # Copy application source
 COPY app ./app
 
-# Set ownership
-RUN chown -R appuser:appgroup /app
+# Create uploads directory and set ownership
+RUN mkdir -p /app/uploads/documents && chown -R appuser:appgroup /app
 
 USER appuser
 
